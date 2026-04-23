@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>2048 — Maimon's Games</title>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13; --surface: #1a1a24; --border: #2a2a38;
+      --accent: #7c6ff7; --text: #e8e8f0; --muted: #7a7a96;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f8; --surface: #ffffff; --border: #dddde8;
+      --accent: #5b4fd4; --text: #1a1a2e; --muted: #6a6a86;
+    }
+
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100dvh; padding: 1rem; gap: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    nav { align-self: flex-start; display: flex; gap: 1rem; align-items: center; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+    nav a:hover { color: var(--text); }
+
+    .top-row {
+      display: flex; align-items: center; gap: 1.5rem;
+      width: min(95vw, 400px); justify-content: space-between;
+    }
+
+    h1 { font-size: 1.5rem; font-weight: 700; }
+
+    .scores { display: flex; gap: 0.75rem; }
+    .score-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.3rem 0.8rem; text-align: center;
+      font-size: 0.75rem;
+    }
+    .score-box .val { font-size: 1rem; font-weight: 700; color: var(--accent); }
+
+    #canvas { border-radius: 12px; max-width: 100%; touch-action: none; }
+
+    .controls { display: flex; gap: 0.75rem; }
+    button {
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.5rem 1.2rem; font-size: 0.9rem; cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+
+    #status { color: var(--muted); font-size: 0.9rem; min-height: 1.2em; text-align: center; font-weight: 600; }
+    #status.win { color: var(--accent); }
+    #status.lose { color: #ef4444; }
+
+    .hint { color: var(--muted); font-size: 0.75rem; text-align: center; }
+
+    .theme-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); padding: 0.35rem 0.9rem;
+      font-size: 0.8rem; cursor: pointer;
+    }
+    .theme-btn:hover { color: var(--text); border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../">← Back</a>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <div class="top-row">
+    <h1>2048</h1>
+    <div class="scores">
+      <div class="score-box">Score<div class="val" id="score">0</div></div>
+      <div class="score-box">Best<div class="val" id="best">0</div></div>
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
+  <div class="controls">
+    <button id="btn-new">New Game</button>
+  </div>
+  <div id="status"></div>
+  <p class="hint">Arrow keys or swipe to slide</p>
+  <script src="game.js"></script>
+</body>
+</html>

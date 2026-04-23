@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle — Maimon's Games</title>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13;--surface:#1a1a24;--border:#2a2a38;--accent:#7c6ff7;--text:#e8e8f0;--muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8;--surface:#ffffff;--border:#dddde8;--accent:#5b4fd4;--text:#1a1a2e;--muted:#6a6a86; }
+    body { background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100dvh;padding:1rem;gap:1rem;transition:background .2s,color .2s; }
+    nav { align-self:flex-start;display:flex;gap:1rem;align-items:center;width:100%; }
+    nav a { color:var(--muted);text-decoration:none;font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.3rem;font-weight:700; }
+
+    #board {
+      display:grid;
+      grid-template-rows:repeat(6,1fr);
+      gap:6px;
+      width:min(95vw,330px);
+    }
+    .row { display:grid;grid-template-columns:repeat(5,1fr);gap:6px; }
+    .tile {
+      aspect-ratio:1;
+      display:flex;align-items:center;justify-content:center;
+      font-size:clamp(1.2rem,5vw,1.6rem);font-weight:700;
+      border:2px solid var(--border);
+      border-radius:4px;
+      text-transform:uppercase;
+      transition:background .1s,border-color .1s;
+      user-select:none;
+    }
+    .tile.filled { border-color:var(--muted); }
+    .tile.correct { background:#538d4e;border-color:#538d4e;color:#fff; }
+    .tile.present { background:#b59f3b;border-color:#b59f3b;color:#fff; }
+    .tile.absent  { background:#3a3a3c;border-color:#3a3a3c;color:#fff; }
+    [data-theme="light"] .tile.absent { background:#787c7e;border-color:#787c7e; }
+
+    #message { font-size:.9rem;font-weight:600;min-height:1.4em;text-align:center; }
+    #message.win  { color:#538d4e; }
+    #message.lose { color:#ef4444; }
+
+    #keyboard { display:flex;flex-direction:column;gap:8px;width:min(95vw,500px); }
+    .kb-row { display:flex;gap:6px;justify-content:center; }
+    .key {
+      height:clamp(42px,10vw,58px);
+      min-width:clamp(28px,7vw,43px);
+      padding:0 4px;
+      background:var(--border);
+      color:var(--text);
+      border:none;border-radius:6px;
+      font-size:clamp(.7rem,2.5vw,.9rem);font-weight:700;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      -webkit-tap-highlight-color:transparent;
+      transition:background .1s;
+      text-transform:uppercase;
+    }
+    .key.wide { min-width:clamp(44px,11vw,65px);font-size:clamp(.6rem,2vw,.75rem); }
+    .key.correct { background:#538d4e;color:#fff; }
+    .key.present { background:#b59f3b;color:#fff; }
+    .key.absent  { background:#3a3a3c;color:#888; }
+    [data-theme="light"] .key { background:#d3d6da;color:#1a1a2e; }
+    [data-theme="light"] .key.absent { background:#787c7e;color:#f4f4f8; }
+
+    .controls { display:flex;gap:.75rem; }
+    button.action { background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.5rem 1.2rem;font-size:.9rem;cursor:pointer; }
+    button.action:hover { border-color:var(--accent); }
+
+    .theme-btn { background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.35rem .9rem;font-size:.8rem;cursor:pointer;margin-left:auto; }
+    .theme-btn:hover { color:var(--text);border-color:var(--accent); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../">← Back</a>
+    <h1>Wordle</h1>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <div id="board"></div>
+  <div id="message"></div>
+  <div id="keyboard"></div>
+  <div class="controls">
+    <button class="action" id="btn-new">New Word</button>
+  </div>
+  <script src="words.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

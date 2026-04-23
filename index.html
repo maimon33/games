@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maimon's Games</title>
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Maimon's Games</h1>
+      <p>Think. Solve. Repeat.</p>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </header>
+  <main class="grid">
+    <a class="card" href="games/maze/">
+      <span class="card-icon">🌀</span>
+      <h2>Maze</h2>
+      <p>Navigate through a randomly generated maze. New layout every run.</p>
+      <span class="tag">logic</span>
+    </a>
+    <a class="card" href="games/sudoku/">
+      <span class="card-icon">🔢</span>
+      <h2>Sudoku</h2>
+      <p>Fill the 9×9 grid so every row, column, and box contains 1–9.</p>
+      <span class="tag">logic</span>
+    </a>
+    <a class="card" href="games/minesweeper/">
+      <span class="card-icon">💣</span>
+      <h2>Minesweeper</h2>
+      <p>Uncover all safe cells without triggering a mine.</p>
+      <span class="tag">deduction</span>
+    </a>
+    <a class="card" href="games/2048/">
+      <span class="card-icon">🔲</span>
+      <h2>2048</h2>
+      <p>Slide tiles and merge matching numbers to reach 2048.</p>
+      <span class="tag">puzzle</span>
+    </a>
+    <a class="card" href="games/sokoban/">
+      <span class="card-icon">📦</span>
+      <h2>Sokoban</h2>
+      <p>Push every crate onto its target. Think before you move.</p>
+      <span class="tag">puzzle</span>
+    </a>
+    <a class="card" href="games/nonogram/">
+      <span class="card-icon">🖼️</span>
+      <h2>Nonogram</h2>
+      <p>Use row and column number clues to reveal a hidden pixel picture.</p>
+      <span class="tag">logic</span>
+    </a>
+    <a class="card" href="games/lights-out/">
+      <span class="card-icon">💡</span>
+      <h2>Lights Out</h2>
+      <p>Toggle cells to turn every light off. Each click flips its neighbors too.</p>
+      <span class="tag">logic</span>
+    </a>
+    <a class="card" href="games/fifteen-puzzle/">
+      <span class="card-icon">🔀</span>
+      <h2>15 Puzzle</h2>
+      <p>Slide tiles into order from 1 to 15. Classic sliding tile challenge.</p>
+      <span class="tag">spatial</span>
+    </a>
+    <a class="card" href="games/wordle/">
+      <span class="card-icon">🔤</span>
+      <h2>Wordle</h2>
+      <p>Guess the 5-letter word in 6 tries. Green means right place, yellow means right letter.</p>
+      <span class="tag">word</span>
+    </a>
+  </main>
+</body>
+</html>
