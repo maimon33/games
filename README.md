@@ -17,6 +17,10 @@ Live at **[games.maimons.dev](https://games.maimons.dev)**
 | Lights Out | Toggle-neighbor grid puzzle |
 | 15 Puzzle | Sliding tile sequence |
 | Wordle | 5-letter word guessing |
+| Traffic Jam | Rush Hour–style sliding car puzzle |
+| Connect Dots | Flow Free–style path connection |
+| Pong | Classic paddle arcade game vs AI |
+| Tank | Drive and shoot arcade game |
 
 ## Local development
 

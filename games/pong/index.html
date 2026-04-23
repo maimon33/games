@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pong — Maimon's Games</title>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13; --surface:#1a1a24; --border:#2a2a38; --accent:#7c6ff7; --text:#e8e8f0; --muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8; --surface:#ffffff; --border:#dddde8; --accent:#5b4fd4; --text:#1a1a2e; --muted:#6a6a86; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif;
+      display:flex; flex-direction:column; align-items:center; min-height:100dvh;
+      padding:1rem; gap:1rem; touch-action:none; transition:background 0.2s,color 0.2s; }
+    nav { align-self:flex-start; display:flex; gap:1rem; align-items:center; }
+    nav a { color:var(--muted); text-decoration:none; font-size:0.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.2rem; font-weight:600; }
+    canvas { border-radius:8px; max-width:100%; touch-action:none; }
+    .controls { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; justify-content:center; }
+    button { background:var(--surface); color:var(--text); border:1px solid var(--border);
+      border-radius:8px; padding:0.5rem 1.2rem; font-size:0.9rem; cursor:pointer;
+      -webkit-tap-highlight-color:transparent; }
+    button:hover { border-color:var(--accent); }
+    .theme-btn { color:var(--muted); padding:0.35rem 0.9rem; font-size:0.8rem; }
+    #status { color:var(--muted); font-size:0.85rem; min-height:1.2em; text-align:center; }
+    #status.win { color:var(--accent); font-weight:600; }
+    .hint { color:var(--muted); font-size:0.75rem; text-align:center; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../">← Back</a>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <h1>Pong</h1>
+  <canvas id="canvas"></canvas>
+  <div class="controls">
+    <button id="btn-start">Start</button>
+    <button id="btn-diff">AI: Medium</button>
+  </div>
+  <div id="status"></div>
+  <p class="hint">Mouse / touch to move paddle • First to 7 wins</p>
+  <script src="game.js"></script>
+</body>
+</html>
