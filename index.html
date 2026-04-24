@@ -4,96 +4,305 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maimon's Games</title>
+  <script src="i18n.js"></script>
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13; --surface: #1a1a24; --border: #2a2a38;
+      --accent: #7c6ff7; --text: #e8e8f0; --muted: #7a7a96;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f8; --surface: #ffffff; --border: #dddde8;
+      --accent: #5b4fd4; --text: #1a1a2e; --muted: #6a6a86;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100dvh;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 3.5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+      pointer-events: none;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: flex-end;
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      gap: 0.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text) 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    .hero p {
+      color: var(--muted);
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+    .hero-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .hero-meta span { color: var(--accent); font-weight: 700; }
+
+    /* ── Filter pills ── */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      padding: 0 1.5rem 1.5rem;
+    }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .pill:hover, .pill.active { border-color: var(--accent); color: var(--text); }
+    .pill.active { background: color-mix(in srgb, var(--accent) 15%, var(--surface)); }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      padding: 0 1.5rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Cards ── */
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem 1.2rem 1.2rem;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow: hidden;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      animation: cardIn 0.4s both;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+      background: var(--c-accent, var(--accent));
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px color-mix(in srgb, var(--c-accent, var(--accent)) 20%, transparent); border-color: var(--c-accent, var(--accent)); }
+    .card:hover::before { opacity: 1; }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:nth-child(1)  { animation-delay: 0.03s; }
+    .card:nth-child(2)  { animation-delay: 0.06s; }
+    .card:nth-child(3)  { animation-delay: 0.09s; }
+    .card:nth-child(4)  { animation-delay: 0.12s; }
+    .card:nth-child(5)  { animation-delay: 0.15s; }
+    .card:nth-child(6)  { animation-delay: 0.18s; }
+    .card:nth-child(7)  { animation-delay: 0.21s; }
+    .card:nth-child(8)  { animation-delay: 0.24s; }
+    .card:nth-child(9)  { animation-delay: 0.27s; }
+    .card:nth-child(10) { animation-delay: 0.30s; }
+    .card:nth-child(11) { animation-delay: 0.33s; }
+    .card:nth-child(12) { animation-delay: 0.36s; }
+    .card:nth-child(13) { animation-delay: 0.39s; }
+
+    .card-icon { font-size: 2rem; line-height: 1; display: block; }
+    .card h2 { font-size: 1.05rem; font-weight: 700; }
+    .card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.45; flex: 1; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 0.4rem; }
+
+    .tag {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; padding: 0.2rem 0.55rem; border-radius: 99px;
+      background: color-mix(in srgb, var(--c-accent, var(--accent)) 15%, var(--surface));
+      color: var(--c-accent, var(--accent));
+    }
+    .badge-new {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 0.18rem 0.5rem; border-radius: 99px;
+      background: #e0c452; color: #1a1500;
+    }
+
+    /* ── Buttons ── */
+    .theme-btn, .lang-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--muted); padding: 0.35rem 0.9rem;
+      font-size: 0.8rem; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    }
+    .theme-btn:hover, .lang-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    /* ── Category color overrides ── */
+    [data-cat="logic"]     { --c-accent: #7c6ff7; }
+    [data-cat="puzzle"]    { --c-accent: #e07c52; }
+    [data-cat="deduction"] { --c-accent: #e05252; }
+    [data-cat="word"]      { --c-accent: #52e07c; }
+    [data-cat="spatial"]   { --c-accent: #52e0d0; }
+    [data-cat="arcade"]    { --c-accent: #e052b0; }
+  </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Maimon's Games</h1>
-      <p>Think. Solve. Repeat.</p>
+  <div class="hero">
+    <div class="hero-top">
+      <button class="lang-btn" onclick="toggleLang()">עב</button>
+      <button class="theme-btn" onclick="toggleTheme()">Light</button>
     </div>
-    <button class="theme-btn" onclick="toggleTheme()">Light</button>
-  </header>
+    <h1>Maimon's Games</h1>
+    <p data-i18n="hub.tagline">Think. Solve. Play.</p>
+    <div class="hero-meta"><span>13</span><span data-i18n="hub.meta"> games · pure browser · no login</span></div>
+  </div>
+
+  <div class="filters">
+    <div class="pill active" data-filter="all" data-i18n="filter.all">All</div>
+    <div class="pill" data-filter="logic" data-i18n="filter.logic">Logic</div>
+    <div class="pill" data-filter="puzzle" data-i18n="filter.puzzle">Puzzle</div>
+    <div class="pill" data-filter="arcade" data-i18n="filter.arcade">Arcade</div>
+    <div class="pill" data-filter="word" data-i18n="filter.word">Word</div>
+    <div class="pill" data-filter="spatial" data-i18n="filter.spatial">Spatial</div>
+    <div class="pill" data-filter="deduction" data-i18n="filter.deduction">Deduction</div>
+  </div>
+
   <main class="grid">
-    <a class="card" href="games/maze/">
+    <a class="card" href="games/maze/" data-cat="logic">
       <span class="card-icon">🌀</span>
-      <h2>Maze</h2>
-      <p>Navigate through a randomly generated maze. New layout every run.</p>
-      <span class="tag">logic</span>
+      <h2 data-i18n="game.maze">Maze</h2>
+      <p data-i18n="desc.maze">Navigate through a randomly generated maze. New layout every run.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.logic">logic</span></div>
     </a>
-    <a class="card" href="games/sudoku/">
+    <a class="card" href="games/sudoku/" data-cat="logic">
       <span class="card-icon">🔢</span>
-      <h2>Sudoku</h2>
-      <p>Fill the 9×9 grid so every row, column, and box contains 1–9.</p>
-      <span class="tag">logic</span>
+      <h2 data-i18n="game.sudoku">Sudoku</h2>
+      <p data-i18n="desc.sudoku">Fill the 9×9 grid so every row, column, and box contains 1–9.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.logic">logic</span></div>
     </a>
-    <a class="card" href="games/minesweeper/">
+    <a class="card" href="games/minesweeper/" data-cat="deduction">
       <span class="card-icon">💣</span>
-      <h2>Minesweeper</h2>
-      <p>Uncover all safe cells without triggering a mine.</p>
-      <span class="tag">deduction</span>
+      <h2 data-i18n="game.minesweeper">Minesweeper</h2>
+      <p data-i18n="desc.minesweeper">Uncover all safe cells without triggering a mine.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.deduction">deduction</span></div>
     </a>
-    <a class="card" href="games/2048/">
+    <a class="card" href="games/2048/" data-cat="puzzle">
       <span class="card-icon">🔲</span>
-      <h2>2048</h2>
-      <p>Slide tiles and merge matching numbers to reach 2048.</p>
-      <span class="tag">puzzle</span>
+      <h2 data-i18n="game.2048">2048</h2>
+      <p data-i18n="desc.2048">Slide tiles and merge matching numbers to reach 2048.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.puzzle">puzzle</span></div>
     </a>
-    <a class="card" href="games/sokoban/">
+    <a class="card" href="games/sokoban/" data-cat="puzzle">
       <span class="card-icon">📦</span>
-      <h2>Sokoban</h2>
-      <p>Push every crate onto its target. Think before you move.</p>
-      <span class="tag">puzzle</span>
+      <h2 data-i18n="game.sokoban">Sokoban</h2>
+      <p data-i18n="desc.sokoban">Push every crate onto its target. Think before you move.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.puzzle">puzzle</span></div>
     </a>
-    <a class="card" href="games/nonogram/">
+    <a class="card" href="games/nonogram/" data-cat="logic">
       <span class="card-icon">🖼️</span>
-      <h2>Nonogram</h2>
-      <p>Use row and column number clues to reveal a hidden pixel picture.</p>
-      <span class="tag">logic</span>
+      <h2 data-i18n="game.nonogram">Nonogram</h2>
+      <p data-i18n="desc.nonogram">Use row and column number clues to reveal a hidden pixel picture.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.logic">logic</span></div>
     </a>
-    <a class="card" href="games/lights-out/">
+    <a class="card" href="games/lights-out/" data-cat="logic">
       <span class="card-icon">💡</span>
-      <h2>Lights Out</h2>
-      <p>Toggle cells to turn every light off. Each click flips its neighbors too.</p>
-      <span class="tag">logic</span>
+      <h2 data-i18n="game.lights-out">Lights Out</h2>
+      <p data-i18n="desc.lights-out">Toggle cells to turn every light off. Each click flips its neighbors too.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.logic">logic</span></div>
     </a>
-    <a class="card" href="games/fifteen-puzzle/">
+    <a class="card" href="games/fifteen-puzzle/" data-cat="spatial">
       <span class="card-icon">🔀</span>
-      <h2>15 Puzzle</h2>
-      <p>Slide tiles into order from 1 to 15. Classic sliding tile challenge.</p>
-      <span class="tag">spatial</span>
+      <h2 data-i18n="game.fifteen">15 Puzzle</h2>
+      <p data-i18n="desc.fifteen">Slide tiles into order from 1 to 15. Classic sliding tile challenge.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.spatial">spatial</span></div>
     </a>
-    <a class="card" href="games/wordle/">
+    <a class="card" href="games/wordle/" data-cat="word">
       <span class="card-icon">🔤</span>
-      <h2>Wordle</h2>
-      <p>Guess the 5-letter word in 6 tries. Green means right place, yellow means right letter.</p>
-      <span class="tag">word</span>
+      <h2 data-i18n="game.wordle">Wordle</h2>
+      <p data-i18n="desc.wordle">Guess the 5-letter word in 6 tries. Green means right place, yellow means right letter.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.word">word</span></div>
     </a>
-    <a class="card" href="games/traffic-jam/">
+    <a class="card" href="games/traffic-jam/" data-cat="puzzle">
       <span class="card-icon">🚗</span>
-      <h2>Traffic Jam</h2>
-      <p>Slide cars out of the way to free the red car. Rush Hour–style puzzle.</p>
-      <span class="tag">puzzle</span>
+      <h2 data-i18n="game.traffic-jam">Traffic Jam</h2>
+      <p data-i18n="desc.traffic-jam">Slide cars out of the way to free the red car. Rush Hour–style puzzle.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.puzzle">puzzle</span><span class="badge-new" data-i18n="badge.new">New</span></div>
     </a>
-    <a class="card" href="games/connect-dots/">
+    <a class="card" href="games/connect-dots/" data-cat="logic">
       <span class="card-icon">🔗</span>
-      <h2>Connect Dots</h2>
-      <p>Draw paths to connect matching colored dots. Fill every cell on the board.</p>
-      <span class="tag">logic</span>
+      <h2 data-i18n="game.connect-dots">Connect Dots</h2>
+      <p data-i18n="desc.connect-dots">Draw paths to connect matching colored dots. Fill every cell on the board.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.logic">logic</span><span class="badge-new" data-i18n="badge.new">New</span></div>
     </a>
-    <a class="card" href="games/pong/">
+    <a class="card" href="games/pong/" data-cat="arcade">
       <span class="card-icon">🏓</span>
-      <h2>Pong</h2>
-      <p>Classic paddle game. Beat the AI to 7 points. Three difficulty levels.</p>
-      <span class="tag">arcade</span>
+      <h2 data-i18n="game.pong">Pong</h2>
+      <p data-i18n="desc.pong">Classic paddle game. Beat the AI to 7 points. Three difficulty levels.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.arcade">arcade</span><span class="badge-new" data-i18n="badge.new">New</span></div>
     </a>
-    <a class="card" href="games/tank/">
+    <a class="card" href="games/tank/" data-cat="arcade">
       <span class="card-icon">🛡️</span>
-      <h2>Tank</h2>
-      <p>Drive your tank and destroy all enemies. Arrow keys to move, Space to shoot.</p>
-      <span class="tag">arcade</span>
+      <h2 data-i18n="game.tank">Tank</h2>
+      <p data-i18n="desc.tank">Drive your tank and destroy all enemies. Arrow keys to move, Space to shoot.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.arcade">arcade</span><span class="badge-new" data-i18n="badge.new">New</span></div>
     </a>
   </main>
+
+  <script>
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const f = pill.dataset.filter;
+        document.querySelectorAll('.card').forEach(card => {
+          card.style.display = (f === 'all' || card.dataset.cat === f) ? '' : 'none';
+        });
+      });
+    });
+  </script>
 </body>
 </html>

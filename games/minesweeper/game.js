@@ -103,7 +103,7 @@ function handleClick(r, c) {
     lost = true;
     clearInterval(timerInterval);
     revealed.fill(1);
-    statusEl.textContent = 'Boom! Game over.';
+    statusEl.textContent = t('status.mine_hit');
     statusEl.className = 'lose';
   } else {
     checkWin();
@@ -127,8 +127,9 @@ function checkWin() {
   if (count === safe) {
     won = true;
     clearInterval(timerInterval);
-    statusEl.textContent = 'Cleared!';
+    statusEl.textContent = t('status.cleared');
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 
@@ -222,7 +223,7 @@ canvas.addEventListener('touchmove', e => {
 btnNew.addEventListener('click', initGame);
 btnDiff.addEventListener('click', () => {
   diffIdx = (diffIdx + 1) % DIFFS.length;
-  btnDiff.textContent = DIFFS[diffIdx].label;
+  btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].label.toLowerCase());
   initGame();
 });
 
@@ -234,5 +235,6 @@ window.addEventListener('resize', () => {
 });
 
 function onThemeChange() { draw(); }
+function onLangChange() { btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].label.toLowerCase()); }
 
 initGame();

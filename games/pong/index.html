@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Pong — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
   <script src="../../theme.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,25 +23,76 @@
       border-radius:8px; padding:0.5rem 1.2rem; font-size:0.9rem; cursor:pointer;
       -webkit-tap-highlight-color:transparent; }
     button:hover { border-color:var(--accent); }
-    .theme-btn { color:var(--muted); padding:0.35rem 0.9rem; font-size:0.8rem; }
+    .theme-btn, .lang-btn { color:var(--muted); padding:0.35rem 0.9rem; font-size:0.8rem; }
     #status { color:var(--muted); font-size:0.85rem; min-height:1.2em; text-align:center; }
     #status.win { color:var(--accent); font-weight:600; }
     .hint { color:var(--muted); font-size:0.75rem; text-align:center; }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;max-width:360px;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
+    .modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1;padding:0;}
+    .modal-close:hover{color:var(--text);}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+    .modal-steps{padding-inline-start:1.2rem;display:flex;flex-direction:column;gap:.65rem;font-size:.88rem;line-height:1.5;}
+    .help-anim{width:100%;border-radius:8px;background:var(--bg);display:block;margin-bottom:1rem;}
   </style>
 </head>
 <body>
   <nav>
-    <a href="../../">← Back</a>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="theme-btn" onclick="openHelp()">?</button>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
     <button class="theme-btn" onclick="toggleTheme()">Light</button>
   </nav>
-  <h1>Pong</h1>
+  <h1 data-i18n="game.pong">Pong</h1>
   <canvas id="canvas"></canvas>
   <div class="controls">
-    <button id="btn-start">Start</button>
+    <button id="btn-start" data-i18n="btn.start">Start</button>
     <button id="btn-diff">AI: Medium</button>
   </div>
   <div id="status"></div>
-  <p class="hint">Mouse / touch to move paddle • First to 7 wins</p>
+  <p class="hint" data-i18n="hint.pong">Mouse / touch to move paddle • First to 7 wins</p>
+  <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeHelp()">×</button>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.pong">Pong</span></div>
+      <canvas id="help-anim" class="help-anim" width="280" height="110"></canvas>
+      <ol class="modal-steps">
+        <li data-i18n-html="help.pong.1">Move your <strong>left paddle</strong> with the mouse or by dragging on mobile.</li>
+        <li data-i18n-html="help.pong.2">Deflect the ball past the AI's paddle to <strong>score a point</strong>.</li>
+        <li data-i18n-html="help.pong.3">First to <strong>7 points</strong> wins. Ball angle changes based on where it hits the paddle.</li>
+      </ol>
+    </div>
+  </div>
+  <script src="../../confetti.js"></script>
+  <script>
+  function openHelp(){document.getElementById('help-modal').style.display='flex';_startAnim();}
+  function closeHelp(){document.getElementById('help-modal').style.display='none';if(_hr){cancelAnimationFrame(_hr);_hr=null;}}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp();});
+  let _hr=null;
+  function _startAnim(){
+    const c=document.getElementById('help-anim');if(!c)return;
+    const ctx=c.getContext('2d'),W=c.width,H=c.height;
+    let bx=W/2,by=H/2,vx=2.2,vy=1.4,p1=H/2-20,p2=H/2-20;
+    function frame(){
+      ctx.fillStyle='#1a1a24';ctx.fillRect(0,0,W,H);
+      ctx.setLineDash([6,6]);ctx.strokeStyle='#2a2a38';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#7c6ff7';ctx.beginPath();ctx.roundRect(10,p1,8,40,3);ctx.fill();
+      ctx.fillStyle='#7a7a96';ctx.beginPath();ctx.roundRect(W-18,p2,8,40,3);ctx.fill();
+      ctx.fillStyle='#e8e8f0';ctx.beginPath();ctx.arc(bx,by,5,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#7c6ff7';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('YOU',W*0.2,10);ctx.fillStyle='#7a7a96';ctx.fillText('AI',W*0.8,10);
+      bx+=vx;by+=vy;
+      if(by<5||by>H-5)vy=-vy;
+      if(bx<22&&by>p1&&by<p1+40){vx=Math.abs(vx);}
+      if(bx>W-22&&by>p2&&by<p2+40){vx=-Math.abs(vx);}
+      if(bx<0||bx>W){bx=W/2;by=H/2;}
+      p2+=(by-(p2+20))*0.05;p2=Math.max(0,Math.min(H-40,p2));
+      _hr=requestAnimationFrame(frame);
+    }
+    if(_hr)cancelAnimationFrame(_hr);_hr=requestAnimationFrame(frame);
+  }
+  </script>
   <script src="game.js"></script>
 </body>
 </html>

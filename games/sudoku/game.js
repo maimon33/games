@@ -150,8 +150,9 @@ function checkWin() {
   for (let r = 0; r < 9; r++)
     for (let c = 0; c < 9; c++)
       if ((puzzle[r][c] || userGrid[r][c]) !== solution[r][c]) return;
-  statusEl.textContent = 'Solved!';
+  statusEl.textContent = t('status.solved');
   statusEl.className = 'win';
+  launchConfetti();
 }
 
 // ---- Keyboard ----
@@ -189,7 +190,7 @@ function newGame() {
 btnNew.addEventListener('click', newGame);
 btnDiff.addEventListener('click', () => {
   diffIdx = (diffIdx + 1) % DIFFS.length;
-  btnDiff.textContent = DIFFS[diffIdx];
+  btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].toLowerCase());
   newGame();
 });
 btnCheck.addEventListener('click', () => {
@@ -197,9 +198,11 @@ btnCheck.addEventListener('click', () => {
   for (let r = 0; r < 9; r++)
     for (let c = 0; c < 9; c++)
       if (!puzzle[r][c] && userGrid[r][c] && userGrid[r][c] !== solution[r][c]) errors++;
-  if (errors === 0) { statusEl.textContent = 'No errors!'; statusEl.className = 'win'; }
+  if (errors === 0) { statusEl.textContent = t('status.no_errors'); statusEl.className = 'win'; }
   else { statusEl.textContent = `${errors} error${errors > 1 ? 's' : ''} found`; statusEl.className = 'error-msg'; }
 });
+
+function onLangChange() { btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].toLowerCase()); }
 
 renderNumpad();
 newGame();

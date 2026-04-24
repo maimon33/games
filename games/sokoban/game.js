@@ -141,8 +141,9 @@ function tryMove(dr, dc) {
   draw();
 
   if ([...targets].every(t => boxes.has(t))) {
-    statusEl.textContent = `Level ${levelIdx + 1} complete! (${moves} moves)`;
+    statusEl.textContent = t('status.level_complete', {n: levelIdx + 1, m: moves});
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 

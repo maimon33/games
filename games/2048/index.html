@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>2048 — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
   <script src="../../theme.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,21 +61,29 @@
 
     .hint { color: var(--muted); font-size: 0.75rem; text-align: center; }
 
-    .theme-btn {
+    .theme-btn, .lang-btn {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 8px; color: var(--muted); padding: 0.35rem 0.9rem;
       font-size: 0.8rem; cursor: pointer;
     }
-    .theme-btn:hover { color: var(--text); border-color: var(--accent); }
+    .theme-btn:hover, .lang-btn:hover { color: var(--text); border-color: var(--accent); }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;max-width:360px;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
+    .modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1;padding:0;}
+    .modal-close:hover{color:var(--text);}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+    .modal-steps{padding-inline-start:1.2rem;display:flex;flex-direction:column;gap:.65rem;font-size:.88rem;line-height:1.5;}
   </style>
 </head>
 <body>
   <nav>
-    <a href="../../">← Back</a>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="theme-btn" onclick="openHelp()">?</button>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
     <button class="theme-btn" onclick="toggleTheme()">Light</button>
   </nav>
   <div class="top-row">
-    <h1>2048</h1>
+    <h1 data-i18n="game.2048">2048</h1>
     <div class="scores">
       <div class="score-box">Score<div class="val" id="score">0</div></div>
       <div class="score-box">Best<div class="val" id="best">0</div></div>
@@ -82,10 +91,27 @@
   </div>
   <canvas id="canvas"></canvas>
   <div class="controls">
-    <button id="btn-new">New Game</button>
+    <button id="btn-new" data-i18n="btn.new_game">New Game</button>
   </div>
   <div id="status"></div>
-  <p class="hint">Arrow keys or swipe to slide</p>
+  <p class="hint" data-i18n="hint.2048">Arrow keys or swipe to slide</p>
+  <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeHelp()">×</button>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.2048">2048</span></div>
+      <ol class="modal-steps">
+        <li data-i18n-html="help.2048.1">Use <strong>arrow keys</strong> or <strong>swipe</strong> to slide all tiles in one direction.</li>
+        <li data-i18n-html="help.2048.2">When two tiles with the <strong>same number</strong> collide, they merge and double.</li>
+        <li data-i18n-html="help.2048.3">Keep merging until you reach the <strong>2048</strong> tile to win!</li>
+      </ol>
+    </div>
+  </div>
+  <script src="../../confetti.js"></script>
+  <script>
+  function openHelp(){document.getElementById('help-modal').style.display='flex';}
+  function closeHelp(){document.getElementById('help-modal').style.display='none';}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp();});
+  </script>
   <script src="game.js"></script>
 </body>
 </html>

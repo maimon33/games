@@ -151,13 +151,14 @@ function move(dir) {
 
   if (!won && board.includes(2048)) {
     won = true;
-    statusEl.textContent = 'You reached 2048!';
+    statusEl.textContent = t('status.reached_2048');
     statusEl.className = 'win';
+    launchConfetti();
   }
 
   if (!canMove()) {
     over = true;
-    statusEl.textContent = 'No moves left.';
+    statusEl.textContent = t('status.game_over');
     statusEl.className = 'lose';
   }
 

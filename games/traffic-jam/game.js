@@ -146,7 +146,7 @@ function initLevel(idx) {
   moves = 0;
   statusEl.textContent = '';
   statusEl.className = '';
-  levelLabel.textContent = `Level ${idx + 1}`;
+  levelLabel.textContent = t('status.level', {n: idx + 1});
   draw();
 }
 
@@ -344,9 +344,10 @@ canvas.addEventListener('touchend', e => {
 }, {passive:false});
 
 function win() {
-  statusEl.textContent = `Solved in ${moves} moves!`;
+  statusEl.textContent = t('status.solved_moves', {n: moves});
   statusEl.className = 'win';
   draw();
+  launchConfetti();
 }
 
 document.getElementById('btn-reset').addEventListener('click', () => initLevel(levelIdx));

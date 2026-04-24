@@ -47,7 +47,7 @@ function initLevel(idx) {
   dragging = null;
   statusEl.textContent = '';
   statusEl.className = '';
-  levelLabel.textContent = `Level ${idx + 1}`;
+  levelLabel.textContent = t('status.level', {n: idx + 1});
   draw();
 }
 
@@ -187,8 +187,9 @@ function checkWin() {
             (first.r===d.r2&&first.c===d.c2&&last.r===d.r1&&last.c===d.c1));
   });
   if (allConnected && filled === total) {
-    statusEl.textContent = 'Solved!';
+    statusEl.textContent = t('status.solved');
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 

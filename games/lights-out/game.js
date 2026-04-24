@@ -101,8 +101,9 @@ function handleClick(clientX, clientY) {
 
   if (grid.every(v => v === 0)) {
     won = true;
-    statusEl.textContent = `All out in ${moves} move${moves !== 1 ? 's' : ''}!`;
+    statusEl.textContent = t('status.all_out', {n: moves, s: moves !== 1 ? 's' : ''});
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 
@@ -115,12 +116,12 @@ canvas.addEventListener('touchend', e => {
 btnNew.addEventListener('click', initGame);
 btnSize.addEventListener('click', () => {
   sizeIdx = (sizeIdx + 1) % SIZES.length;
-  btnSize.textContent = `Size: ${SIZES[sizeIdx]}×${SIZES[sizeIdx]}`;
+  btnSize.textContent = t('lo.size_' + SIZES[sizeIdx]);
   initGame();
 });
 btnDiff.addEventListener('click', () => {
   diffIdx = (diffIdx + 1) % DIFFS.length;
-  btnDiff.textContent = DIFFS[diffIdx].label;
+  btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].label.toLowerCase());
   initGame();
 });
 
@@ -131,5 +132,9 @@ window.addEventListener('resize', () => {
 });
 
 function onThemeChange() { draw(); }
+function onLangChange() {
+  btnSize.textContent = t('lo.size_' + SIZES[sizeIdx]);
+  btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].label.toLowerCase());
+}
 
 initGame();

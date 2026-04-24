@@ -209,8 +209,9 @@ function checkWin() {
     if (sol[i] === 1 && userGrid[i] !== 1) return;
     if (sol[i] === 0 && userGrid[i] === 1) return;
   }
-  statusEl.textContent = `"${PUZZLES[puzzleIdx].name}" solved!`;
+  statusEl.textContent = t('status.nonogram_solved', {name: PUZZLES[puzzleIdx].name});
   statusEl.className = 'win';
+  launchConfetti();
 }
 
 canvas.addEventListener('click', e => {

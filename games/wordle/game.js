@@ -142,8 +142,9 @@ function submit() {
 
   if (guesses[guesses.length - 1] === target) {
     done = true;
-    messageEl.textContent = ['Genius!', 'Magnificent!', 'Impressive!', 'Splendid!', 'Great!', 'Phew!'][guesses.length - 1] || 'Nice!';
+    messageEl.textContent = [t('wordle.genius'), t('wordle.magnificent'), t('wordle.impressive'), t('wordle.splendid'), t('wordle.great'), t('wordle.phew')][guesses.length - 1] || t('wordle.nice');
     messageEl.className = 'win';
+    launchConfetti();
     return;
   }
   if (guesses.length >= ROWS) {

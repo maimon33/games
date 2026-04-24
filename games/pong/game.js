@@ -168,7 +168,7 @@ function startGame() {
   if (rafId) cancelAnimationFrame(rafId);
   initGame();
   running = true;
-  btnStart.textContent = 'Restart';
+  btnStart.textContent = t('btn.restart');
   rafId = requestAnimationFrame(loop);
 }
 
@@ -176,15 +176,16 @@ function endGame(playerWon) {
   running = false;
   cancelAnimationFrame(rafId);
   draw();
-  statusEl.textContent = playerWon ? 'You win!' : 'AI wins!';
+  statusEl.textContent = t(playerWon ? 'status.win' : 'status.lose_ai');
   statusEl.className = playerWon ? 'win' : '';
-  btnStart.textContent = 'Play Again';
+  if (playerWon) launchConfetti();
+  btnStart.textContent = t('btn.play_again');
 }
 
 btnStart.addEventListener('click', startGame);
 btnDiff.addEventListener('click', () => {
   diffIdx = (diffIdx + 1) % DIFFS.length;
-  btnDiff.textContent = `AI: ${DIFFS[diffIdx]}`;
+  btnDiff.textContent = t('btn.ai_' + DIFFS[diffIdx].toLowerCase());
 });
 
 canvas.addEventListener('mousemove', e => {
@@ -199,6 +200,7 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', () => { touchY = null; }, {passive: false});
 
 function onThemeChange() { if (!running) drawIdle(); else draw(); }
+function onLangChange() { btnDiff.textContent = t('btn.ai_' + DIFFS[diffIdx].toLowerCase()); }
 
 window.addEventListener('resize', resize);
 resize();

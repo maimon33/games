@@ -118,8 +118,9 @@ function move(dr, dc) {
   draw();
   if (player.r === rows - 1 && player.c === cols - 1) {
     won = true;
-    statusEl.textContent = 'Solved!';
+    statusEl.textContent = t('status.solved');
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 
@@ -149,12 +150,13 @@ canvas.addEventListener('touchend', e => {
 btnNew.addEventListener('click', initMaze);
 btnSize.addEventListener('click', () => {
   sizeIdx = (sizeIdx + 1) % SIZES.length;
-  btnSize.textContent = `Size: ${SIZES[sizeIdx].label}`;
+  btnSize.textContent = t('maze.size_' + SIZES[sizeIdx].label.toLowerCase());
   initMaze();
 });
 
 window.addEventListener('resize', resize);
 
 function onThemeChange() { draw(); }
+function onLangChange() { btnSize.textContent = t('maze.size_' + SIZES[sizeIdx].label.toLowerCase()); }
 
 initMaze();

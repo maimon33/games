@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wordle — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
   <script src="../../theme.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -68,22 +69,48 @@
     button.action { background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.5rem 1.2rem;font-size:.9rem;cursor:pointer; }
     button.action:hover { border-color:var(--accent); }
 
-    .theme-btn { background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.35rem .9rem;font-size:.8rem;cursor:pointer;margin-left:auto; }
-    .theme-btn:hover { color:var(--text);border-color:var(--accent); }
+    .theme-btn, .lang-btn { background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.35rem .9rem;font-size:.8rem;cursor:pointer; }
+    .theme-btn { margin-left:auto; }
+    .theme-btn:hover, .lang-btn:hover { color:var(--text);border-color:var(--accent); }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;max-width:360px;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
+    .modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1;padding:0;}
+    .modal-close:hover{color:var(--text);}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+    .modal-steps{padding-inline-start:1.2rem;display:flex;flex-direction:column;gap:.65rem;font-size:.88rem;line-height:1.5;}
   </style>
 </head>
 <body>
   <nav>
-    <a href="../../">← Back</a>
-    <h1>Wordle</h1>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <h1 data-i18n="game.wordle">Wordle</h1>
+    <button class="theme-btn" onclick="openHelp()">?</button>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
     <button class="theme-btn" onclick="toggleTheme()">Light</button>
   </nav>
   <div id="board"></div>
   <div id="message"></div>
   <div id="keyboard"></div>
   <div class="controls">
-    <button class="action" id="btn-new">New Word</button>
+    <button class="action" id="btn-new" data-i18n="btn.new_word">New Word</button>
   </div>
+  <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeHelp()">×</button>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.wordle">Wordle</span></div>
+      <ol class="modal-steps">
+        <li data-i18n-html="help.wordle.1">Type any <strong>5-letter word</strong> and press Enter to guess.</li>
+        <li data-i18n-html="help.wordle.2">🟩 <strong>Green</strong> = right letter, right place. 🟨 <strong>Yellow</strong> = right letter, wrong place. ⬛ Gray = not in the word.</li>
+        <li data-i18n-html="help.wordle.3">You have <strong>6 guesses</strong>. Use the color hints to narrow it down!</li>
+      </ol>
+    </div>
+  </div>
+  <script src="../../confetti.js"></script>
+  <script>
+  function openHelp(){document.getElementById('help-modal').style.display='flex';}
+  function closeHelp(){document.getElementById('help-modal').style.display='none';}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp();});
+  </script>
   <script src="words.js"></script>
   <script src="game.js"></script>
 </body>

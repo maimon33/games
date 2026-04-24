@@ -141,7 +141,7 @@ function initLevel(idx) {
   gameOver = false;
   statusEl.textContent = '';
   statusEl.className = '';
-  levelLabel.textContent = `Level ${idx + 1}`;
+  levelLabel.textContent = t('status.level', {n: idx + 1});
   rafId = requestAnimationFrame(loop);
 }
 
@@ -279,7 +279,7 @@ function loop() {
           player = null;
           gameOver = true;
           draw();
-          statusEl.textContent = 'You were destroyed!';
+          statusEl.textContent = t('status.tank_destroyed');
           statusEl.className = 'lose';
           return false;
         }
@@ -295,12 +295,13 @@ function loop() {
     gameOver = true;
     draw();
     if (levelIdx + 1 < LEVELS.length) {
-      statusEl.textContent = 'Level cleared! ▶ Next';
+      statusEl.textContent = t('status.level_cleared_next');
       statusEl.className = 'win';
       setTimeout(() => initLevel(levelIdx + 1), 1200);
     } else {
-      statusEl.textContent = 'All levels complete!';
+      statusEl.textContent = t('status.all_levels');
       statusEl.className = 'win';
+      launchConfetti();
     }
     return;
   }

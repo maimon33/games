@@ -98,8 +98,9 @@ function slide(tileIdx) {
   if (board.every((v, i) => v === (i === N * N - 1 ? 0 : i + 1))) {
     won = true;
     clearInterval(timerInterval);
-    statusEl.textContent = `Solved in ${moves} moves!`;
+    statusEl.textContent = t('status.solved_moves', {n: moves});
     statusEl.className = 'win';
+    launchConfetti();
   }
 }
 
