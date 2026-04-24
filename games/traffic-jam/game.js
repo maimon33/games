@@ -111,7 +111,7 @@ const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 const levelLabel = document.getElementById('level-label');
 
-let CELL, PAD, cars, selected, levelIdx, moves;
+let CELL, PAD, cars = [], selected = null, levelIdx = 0, moves = 0;
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 

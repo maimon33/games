@@ -25,7 +25,7 @@ const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 const levelLabel = document.getElementById('level-label');
 
-let CELL, GRID_SIZE, dots, paths, dragging, levelIdx;
+let CELL, GRID_SIZE, dots = [], paths = [], dragging = null, levelIdx = 0;
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
