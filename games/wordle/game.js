@@ -131,10 +131,7 @@ function del() {
 
 function submit() {
   if (done || current.length < COLS) return;
-  if (!WORDS.includes(current)) {
-    flash();
-    return;
-  }
+
   guesses.push(current);
   current = '';
   renderBoard();

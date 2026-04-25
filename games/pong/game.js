@@ -123,11 +123,12 @@ function update() {
   if (ball.vx < 0 &&
       ball.x - BALL_R < playerPaddle.x + playerPaddle.w &&
       ball.x + BALL_R > playerPaddle.x &&
-      ball.y > playerPaddle.y && ball.y < playerPaddle.y + playerPaddle.h) {
+      ball.y + BALL_R > playerPaddle.y && ball.y - BALL_R < playerPaddle.y + playerPaddle.h) {
     ball.x = playerPaddle.x + playerPaddle.w + BALL_R;
     const relY = (ball.y - (playerPaddle.y + playerPaddle.h/2)) / (playerPaddle.h/2);
     const angle = relY * 0.9;
-    const speed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy) * 1.04;
+    const rawSpeed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy) * 1.04;
+    const speed = Math.min(rawSpeed, W * 0.028);
     ball.vx = Math.abs(Math.cos(angle) * speed);
     ball.vy = Math.sin(angle) * speed;
   }
@@ -136,11 +137,12 @@ function update() {
   if (ball.vx > 0 &&
       ball.x + BALL_R > aiPaddle.x &&
       ball.x - BALL_R < aiPaddle.x + aiPaddle.w &&
-      ball.y > aiPaddle.y && ball.y < aiPaddle.y + aiPaddle.h) {
+      ball.y + BALL_R > aiPaddle.y && ball.y - BALL_R < aiPaddle.y + aiPaddle.h) {
     ball.x = aiPaddle.x - BALL_R;
     const relY = (ball.y - (aiPaddle.y + aiPaddle.h/2)) / (aiPaddle.h/2);
     const angle = relY * 0.9;
-    const speed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy) * 1.04;
+    const rawSpeed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy) * 1.04;
+    const speed = Math.min(rawSpeed, W * 0.028);
     ball.vx = -(Math.abs(Math.cos(angle) * speed));
     ball.vy = Math.sin(angle) * speed;
   }

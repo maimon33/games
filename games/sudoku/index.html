@@ -85,6 +85,7 @@
     .numpad button:hover { border-color: var(--accent); }
     .numpad button:active { opacity: 0.7; }
     .numpad button.erase { font-size: 1rem; color: var(--muted); }
+    .numpad button:disabled, .numpad button.done { opacity: 0.22; cursor: default; pointer-events: none; }
 
     .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
 
@@ -127,6 +128,7 @@
     <button class="action" id="btn-new" data-i18n="btn.new_game">New Game</button>
     <button class="action" id="btn-diff">Easy</button>
     <button class="action" id="btn-check" data-i18n="btn.check">Check</button>
+    <button class="action" id="btn-size" onclick="toggle6x6()">6×6</button>
   </div>
   <div id="status"></div>
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
