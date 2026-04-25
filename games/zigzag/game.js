@@ -117,7 +117,7 @@ function updateDying() {
 
   if (deadVY > 12) {
     state = 'dead';
-    statusEl.textContent = 'Score: ' + score + ' — Tap to restart';
+    statusEl.textContent = t('status.zigzag_over', { n: score });
     statusEl.className = 'lose';
   }
 }

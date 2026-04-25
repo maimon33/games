@@ -421,12 +421,12 @@ function loop() {
       state = 'won';
       winTimer = 0;
       const starStr = '★'.repeat(starsCollected);
-      statusEl.textContent = (starStr ? starStr + ' ' : '') + 'Level complete!';
+      statusEl.textContent = (starStr ? starStr + ' ' : '') + t('status.level_cleared_next');
       statusEl.className = 'win';
       if (typeof launchConfetti === 'function') launchConfetti();
     } else if (checkLose(_candyIdx)) {
       state = 'lost';
-      statusEl.textContent = 'Try again!';
+      statusEl.textContent = t('status.level_failed');
       statusEl.className = 'lose';
     }
   } else if (state === 'won') {

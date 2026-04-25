@@ -44,6 +44,7 @@
       align-items: center;
       gap: 1.2rem;
       width: min(380px, calc(100vw - 2rem));
+      direction: ltr;
     }
     #question {
       font-size: clamp(1.8rem, 8vw, 2.8rem);
@@ -52,11 +53,14 @@
       color: var(--text);
       min-height: 1.2em;
       text-align: center;
+      direction: ltr;
+      unicode-bidi: isolate;
     }
     .answer-row {
       display: flex;
       gap: 0.5rem;
       width: 100%;
+      direction: ltr;
     }
     #answer-input {
       flex: 1;

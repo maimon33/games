@@ -2,14 +2,31 @@ const canvas   = document.getElementById('canvas');
 const ctx      = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 
-// Puzzle solutions stored as flat 1D arrays (row-major)
 const PUZZLES = [
-  { name: 'Cross',    size: 5, sol: [0,0,1,0,0, 0,0,1,0,0, 1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0] },
-  { name: 'Diamond',  size: 5, sol: [0,0,1,0,0, 0,1,1,1,0, 1,1,1,1,1, 0,1,1,1,0, 0,0,1,0,0] },
-  { name: 'Heart',    size: 5, sol: [0,1,0,1,0, 1,1,1,1,1, 1,1,1,1,1, 0,1,1,1,0, 0,0,1,0,0] },
-  { name: 'T-shape',  size: 5, sol: [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0] },
-  { name: 'Z-shape',  size: 5, sol: [1,1,1,1,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,1,1,1,1] },
-  { name: 'Smiley',   size: 8, sol: [
+  // === EASY (5×5) ===
+  { name: 'Cross',    size: 5, diff: 'Easy', sol: [
+    0,0,1,0,0, 0,0,1,0,0, 1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0] },
+  { name: 'Diamond',  size: 5, diff: 'Easy', sol: [
+    0,0,1,0,0, 0,1,1,1,0, 1,1,1,1,1, 0,1,1,1,0, 0,0,1,0,0] },
+  { name: 'Heart',    size: 5, diff: 'Easy', sol: [
+    0,1,0,1,0, 1,1,1,1,1, 1,1,1,1,1, 0,1,1,1,0, 0,0,1,0,0] },
+  { name: 'T-shape',  size: 5, diff: 'Easy', sol: [
+    1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0] },
+  { name: 'Z-shape',  size: 5, diff: 'Easy', sol: [
+    1,1,1,1,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,1,1,1,1] },
+  { name: 'Frame',    size: 5, diff: 'Easy', sol: [
+    1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1] },
+  { name: 'L-shape',  size: 5, diff: 'Easy', sol: [
+    1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,1] },
+  { name: 'Steps',    size: 5, diff: 'Easy', sol: [
+    1,1,0,0,0, 1,1,0,0,0, 0,1,1,0,0, 0,0,1,1,0, 0,0,0,1,1] },
+  { name: 'U-shape',  size: 5, diff: 'Easy', sol: [
+    1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1] },
+  { name: 'Checkers', size: 5, diff: 'Easy', sol: [
+    1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1] },
+
+  // === MEDIUM (8×8) ===
+  { name: 'Smiley',   size: 8, diff: 'Medium', sol: [
     0,0,1,1,1,1,0,0,
     0,1,0,0,0,0,1,0,
     1,0,1,0,0,1,0,1,
@@ -17,9 +34,8 @@ const PUZZLES = [
     1,0,1,0,0,1,0,1,
     1,0,0,1,1,0,0,1,
     0,1,0,0,0,0,1,0,
-    0,0,1,1,1,1,0,0,
-  ]},
-  { name: 'House',    size: 8, sol: [
+    0,0,1,1,1,1,0,0] },
+  { name: 'House',    size: 8, diff: 'Medium', sol: [
     0,0,0,1,1,0,0,0,
     0,0,1,1,1,1,0,0,
     0,1,1,1,1,1,1,0,
@@ -27,9 +43,8 @@ const PUZZLES = [
     1,1,0,1,1,0,1,1,
     1,1,0,1,1,0,1,1,
     1,1,1,1,1,1,1,1,
-    1,1,1,1,1,1,1,1,
-  ]},
-  { name: 'Tree',     size: 8, sol: [
+    1,1,1,1,1,1,1,1] },
+  { name: 'Tree',     size: 8, diff: 'Medium', sol: [
     0,0,0,1,1,0,0,0,
     0,0,1,1,1,1,0,0,
     0,1,1,1,1,1,1,0,
@@ -37,15 +52,185 @@ const PUZZLES = [
     0,0,0,1,1,0,0,0,
     0,0,0,1,1,0,0,0,
     0,0,1,1,1,1,0,0,
-    0,0,0,0,0,0,0,0,
-  ]},
+    0,0,0,0,0,0,0,0] },
+  { name: 'Star',     size: 8, diff: 'Medium', sol: [
+    0,0,0,1,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,0,0,1,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    0,0,0,1,1,0,0,0] },
+  { name: 'Arrow',    size: 8, diff: 'Medium', sol: [
+    0,0,0,0,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    0,0,1,1,1,0,0,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,0,1,1,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    0,0,0,0,1,0,0,0] },
+  { name: 'Crown',    size: 8, diff: 'Medium', sol: [
+    1,0,1,0,0,1,0,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    1,1,0,0,0,0,1,1,
+    1,1,0,0,0,0,1,1,
+    1,1,0,0,0,0,1,1,
+    0,0,0,0,0,0,0,0] },
+  { name: 'Diamond8', size: 8, diff: 'Medium', sol: [
+    0,0,0,1,1,0,0,0,
+    0,0,1,1,1,1,0,0,
+    0,1,1,1,1,1,1,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,1,1,1,1,1,1,0,
+    0,0,1,1,1,1,0,0,
+    0,0,0,1,1,0,0,0] },
+  { name: 'Sailboat', size: 8, diff: 'Medium', sol: [
+    0,0,0,0,1,0,0,0,
+    0,0,0,1,1,0,0,0,
+    0,0,1,1,1,0,0,0,
+    0,1,1,1,1,0,0,0,
+    1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,
+    0,1,1,1,1,1,1,0,
+    0,0,1,1,1,1,0,0] },
+
+  // === HARD (10×10) ===
+  { name: 'Mushroom', size: 10, diff: 'Hard', sol: [
+    0,0,0,1,1,1,1,0,0,0,
+    0,0,1,1,1,1,1,1,0,0,
+    0,1,1,0,1,1,0,1,1,0,
+    0,1,1,1,1,1,1,1,1,0,
+    0,1,1,1,1,1,1,1,1,0,
+    0,0,1,1,1,1,1,1,0,0,
+    0,0,0,0,1,1,0,0,0,0,
+    0,0,0,0,1,1,0,0,0,0,
+    0,0,0,1,1,1,1,0,0,0,
+    0,0,0,0,0,0,0,0,0,0] },
+  { name: 'Castle',   size: 10, diff: 'Hard', sol: [
+    1,1,0,1,1,1,1,0,1,1,
+    1,1,0,1,1,1,1,0,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,0,0,1,1,0,0,1,1,
+    1,1,0,0,1,1,0,0,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,1,0,0,0,0,1,1,1,
+    1,1,1,0,0,0,0,1,1,1,
+    1,1,1,0,0,0,0,1,1,1] },
+  { name: 'Sun',      size: 10, diff: 'Hard', sol: [
+    0,0,0,1,0,0,1,0,0,0,
+    0,1,0,0,0,0,0,0,1,0,
+    0,0,1,1,1,1,1,1,0,0,
+    1,0,1,1,1,1,1,1,0,1,
+    0,0,1,1,1,1,1,1,0,0,
+    0,0,1,1,1,1,1,1,0,0,
+    1,0,1,1,1,1,1,1,0,1,
+    0,0,1,1,1,1,1,1,0,0,
+    0,1,0,0,0,0,0,0,1,0,
+    0,0,0,1,0,0,1,0,0,0] },
+  { name: 'Robot',    size: 10, diff: 'Hard', sol: [
+    0,1,1,1,1,1,1,1,1,0,
+    1,0,0,0,0,0,0,0,0,1,
+    1,0,1,1,0,0,1,1,0,1,
+    1,0,1,1,0,0,1,1,0,1,
+    1,0,0,0,0,0,0,0,0,1,
+    1,0,1,0,0,0,0,1,0,1,
+    1,0,0,1,1,1,1,0,0,1,
+    1,0,0,0,0,0,0,0,0,1,
+    0,1,1,1,1,1,1,1,1,0,
+    0,0,1,1,0,0,1,1,0,0] },
+  { name: 'Spaceship',size: 10, diff: 'Hard', sol: [
+    0,0,0,0,1,1,0,0,0,0,
+    0,0,0,1,1,1,1,0,0,0,
+    0,0,1,1,1,1,1,1,0,0,
+    0,1,1,1,1,1,1,1,1,0,
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    0,1,1,0,1,1,0,1,1,0,
+    0,1,0,0,1,1,0,0,1,0,
+    0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0] },
+  { name: 'Skull',    size: 10, diff: 'Hard', sol: [
+    0,1,1,1,1,1,1,1,1,0,
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,0,1,1,1,1,0,1,1,
+    1,1,0,1,1,1,1,0,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    0,1,1,1,1,1,1,1,1,0,
+    0,0,1,1,1,1,1,1,0,0,
+    0,1,0,1,1,1,1,0,1,0,
+    0,1,1,0,1,1,0,1,1,0,
+    0,0,0,0,0,0,0,0,0,0] },
+
+  // === EXPERT (15×15) ===
+  { name: 'Building', size: 15, diff: 'Expert', sol: [
+    0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,
+    0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,
+    0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,
+    0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,
+    0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,0,0,1,1,1,1,1,1,1,0,0,1,1,
+    1,1,0,0,1,1,1,1,1,1,1,0,0,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,
+    1,1,1,1,1,1,0,0,0,1,1,1,1,1,1] },
+  { name: 'Letter H', size: 15, diff: 'Expert', sol: [
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,
+    1,1,0,0,0,0,0,0,0,0,0,0,0,1,1] },
+  { name: 'Big Cross',size: 15, diff: 'Expert', sol: [
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0] },
 ];
 
-let puzzleIdx = 0;
-let userGrid;   // 0=empty, 1=filled, 2=marked(X)
+const DIFFS = ['All', 'Easy', 'Medium', 'Hard', 'Expert'];
+let diffIdx = 0;
+let filteredIdx = 0;
+let userGrid;
 let clues;
 
 function cv(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function getFiltered() {
+  return diffIdx === 0 ? PUZZLES : PUZZLES.filter(p => p.diff === DIFFS[diffIdx]);
+}
+
+function currentPuzzle() { return getFiltered()[filteredIdx]; }
 
 function computeClues(sol, size) {
   const row = [], col = [];
@@ -71,17 +256,18 @@ function computeClues(sol, size) {
 }
 
 function loadPuzzle(idx) {
-  puzzleIdx = ((idx % PUZZLES.length) + PUZZLES.length) % PUZZLES.length;
-  const { sol, size } = PUZZLES[puzzleIdx];
-  userGrid = new Uint8Array(size * size);
-  clues = computeClues(sol, size);
+  const filtered = getFiltered();
+  filteredIdx = ((idx % filtered.length) + filtered.length) % filtered.length;
+  const p = filtered[filteredIdx];
+  userGrid = new Uint8Array(p.size * p.size);
+  clues = computeClues(p.sol, p.size);
   statusEl.textContent = '';
   statusEl.className = '';
   draw();
 }
 
 function sizes() {
-  const { size } = PUZZLES[puzzleIdx];
+  const { size } = currentPuzzle();
   const maxClues = Math.max(
     ...clues.row.map(c => c.length),
     ...clues.col.map(c => c.length)
@@ -105,46 +291,39 @@ function draw() {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // Column clues (bottom-aligned above grid)
   for (let c = 0; c < size; c++) {
     const cl = clues.col[c];
     const x = gutter + c * cs + cs / 2;
     cl.forEach((n, i) => {
       const offset = cl.length - 1 - i;
-      const y = gutter - offset * cs - cs / 2;
       ctx.fillStyle = cv('--muted');
-      ctx.fillText(n, x, y);
+      ctx.fillText(n, x, gutter - offset * cs - cs / 2);
     });
   }
 
-  // Row clues (right-aligned left of grid)
   for (let r = 0; r < size; r++) {
     const cl = clues.row[r];
     const y = gutter + r * cs + cs / 2;
     cl.forEach((n, i) => {
       const offset = cl.length - 1 - i;
-      const x = gutter - offset * cs - cs / 2;
       ctx.fillStyle = cv('--muted');
-      ctx.fillText(n, x, y);
+      ctx.fillText(n, gutter - offset * cs - cs / 2, y);
     });
   }
 
-  // Grid cells
-  const { sol } = PUZZLES[puzzleIdx];
+  const bs = size <= 6 ? 2 : 5;
+  const { sol } = currentPuzzle();
+
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       const x = gutter + c * cs, y = gutter + r * cs;
       const state = userGrid[r * size + c];
 
-      // Box background
-      ctx.fillStyle = (r % 3 < 1 || c % 3 < 1) && size === 5
-        ? cv('--surface')
-        : cv('--surface');
+      ctx.fillStyle = cv('--surface');
       ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
 
-      // 3x3 box shading for 5x5 puzzles (subtle)
-      if ((Math.floor(r / 3) + Math.floor(c / 3)) % 2 === 0) {
-        ctx.fillStyle = cv('--border') + '55';
+      if ((Math.floor(r / bs) + Math.floor(c / bs)) % 2 === 0) {
+        ctx.fillStyle = cv('--border') + '44';
         ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
       }
 
@@ -160,20 +339,25 @@ function draw() {
         ctx.font = font;
       }
 
-      // Grid lines
       ctx.strokeStyle = cv('--border');
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, cs, cs);
 
-      // Thick lines every 5 cols/rows for 8x8
-      if (size === 8) {
-        if (c % 4 === 0) { ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + cs); ctx.stroke(); ctx.lineWidth = 1; }
-        if (r % 4 === 0) { ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + cs, y); ctx.stroke(); ctx.lineWidth = 1; }
+      if (size >= 10 && bs > 2) {
+        if (c % bs === 0 && c > 0) {
+          ctx.lineWidth = 2; ctx.strokeStyle = cv('--muted') + '88';
+          ctx.beginPath(); ctx.moveTo(x, gutter); ctx.lineTo(x, gutter + size * cs); ctx.stroke();
+          ctx.lineWidth = 1;
+        }
+        if (r % bs === 0 && r > 0) {
+          ctx.lineWidth = 2; ctx.strokeStyle = cv('--muted') + '88';
+          ctx.beginPath(); ctx.moveTo(gutter, y); ctx.lineTo(gutter + size * cs, y); ctx.stroke();
+          ctx.lineWidth = 1;
+        }
       }
     }
   }
 
-  // Outer border
   ctx.strokeStyle = cv('--text');
   ctx.lineWidth = 2;
   ctx.strokeRect(gutter, gutter, size * cs, size * cs);
@@ -192,7 +376,7 @@ function cellFromPos(clientX, clientY) {
 }
 
 function toggleCell(r, c, mode) {
-  const { size } = PUZZLES[puzzleIdx];
+  const { size } = currentPuzzle();
   const idx = r * size + c;
   if (mode === 'fill') {
     userGrid[idx] = userGrid[idx] === 1 ? 0 : 1;
@@ -204,12 +388,12 @@ function toggleCell(r, c, mode) {
 }
 
 function checkWin() {
-  const { sol, size } = PUZZLES[puzzleIdx];
+  const { sol, size, name } = currentPuzzle();
   for (let i = 0; i < size * size; i++) {
     if (sol[i] === 1 && userGrid[i] !== 1) return;
     if (sol[i] === 0 && userGrid[i] === 1) return;
   }
-  statusEl.textContent = t('status.nonogram_solved', {name: PUZZLES[puzzleIdx].name});
+  statusEl.textContent = t('status.nonogram_solved', {name});
   statusEl.className = 'win';
   launchConfetti();
 }
@@ -237,15 +421,26 @@ canvas.addEventListener('touchstart', e => {
 canvas.addEventListener('touchend', () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } });
 canvas.addEventListener('touchmove', () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } }, { passive: true });
 
-document.getElementById('btn-prev').addEventListener('click', () => loadPuzzle(puzzleIdx - 1));
-document.getElementById('btn-next').addEventListener('click', () => loadPuzzle(puzzleIdx + 1));
+document.getElementById('btn-prev').addEventListener('click', () => loadPuzzle(filteredIdx - 1));
+document.getElementById('btn-next').addEventListener('click', () => loadPuzzle(filteredIdx + 1));
 document.getElementById('btn-reveal').addEventListener('click', () => {
-  const { sol, size } = PUZZLES[puzzleIdx];
+  const { sol, size } = currentPuzzle();
   for (let i = 0; i < size * size; i++) userGrid[i] = sol[i] ? 1 : 0;
   draw();
-  statusEl.textContent = `Answer revealed.`;
+  statusEl.textContent = t('btn.reveal');
   statusEl.className = '';
 });
+
+function cycleDiff() {
+  diffIdx = (diffIdx + 1) % DIFFS.length;
+  filteredIdx = 0;
+  document.getElementById('btn-diff').textContent = t('btn.diff_' + DIFFS[diffIdx].toLowerCase());
+  loadPuzzle(0);
+}
+
+function onLangChange() {
+  document.getElementById('btn-diff').textContent = t('btn.diff_' + DIFFS[diffIdx].toLowerCase());
+}
 
 window.addEventListener('resize', draw);
 function onThemeChange() { draw(); }

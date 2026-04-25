@@ -195,7 +195,7 @@ document.addEventListener('keydown', e => {
 // ---- Controls ----
 
 function newGame() {
-  statusEl.textContent = 'Generating…';
+  statusEl.textContent = t('status.generating');
   statusEl.className = '';
   selected = null;
   setTimeout(() => {
@@ -229,7 +229,7 @@ btnCheck.addEventListener('click', () => {
     for (let c = 0; c < gridN; c++)
       if (!puzzle[r][c] && userGrid[r][c] && userGrid[r][c] !== solution[r][c]) errors++;
   if (errors === 0) { statusEl.textContent = t('status.no_errors'); statusEl.className = 'win'; }
-  else { statusEl.textContent = `${errors} error${errors > 1 ? 's' : ''} found`; statusEl.className = 'error-msg'; }
+  else { statusEl.textContent = t(errors === 1 ? 'status.errors_found_one' : 'status.errors_found_many', { n: errors }); statusEl.className = 'error-msg'; }
 });
 
 function onLangChange() { btnDiff.textContent = t('btn.diff_' + DIFFS[diffIdx].toLowerCase()); }
