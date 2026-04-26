@@ -101,6 +101,122 @@ const LEVELS = [
     {id:8,row:5,col:2,len:2,dir:'h'},
     {id:9,row:5,col:4,len:2,dir:'h'},
   ],
+  // Level 11 — move C left, A down twice to clear col 2
+  // Grid: A(0,2)v3 blocks row2. C(4,2)h2 blocks A going down. D(3,4)v2 filler.
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:0,col:2,len:3,dir:'v'},
+    {id:2,row:0,col:0,len:2,dir:'h'},
+    {id:3,row:4,col:2,len:2,dir:'h'},
+    {id:4,row:3,col:4,len:2,dir:'v'},
+    {id:5,row:4,col:0,len:2,dir:'h'},
+  ],
+  // Level 12 — A(1,2)v2 blocks col2; B(2,3)v3 blocks col3; unblock each then exit
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:1,col:2,len:2,dir:'v'},
+    {id:2,row:2,col:3,len:3,dir:'v'},
+    {id:3,row:0,col:0,len:2,dir:'h'},
+    {id:4,row:0,col:3,len:2,dir:'h'},
+    {id:5,row:4,col:0,len:3,dir:'h'},
+    {id:6,row:5,col:2,len:3,dir:'h'},
+  ],
+  // Level 13 — three vertical blockers in row 2 requiring chain of moves
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:1,col:2,len:2,dir:'v'},
+    {id:2,row:0,col:3,len:3,dir:'v'},
+    {id:3,row:2,col:4,len:2,dir:'v'},
+    {id:4,row:0,col:0,len:2,dir:'h'},
+    {id:5,row:4,col:1,len:2,dir:'h'},
+    {id:6,row:3,col:0,len:2,dir:'v'},
+    {id:7,row:5,col:3,len:2,dir:'h'},
+  ],
+  // Level 14 — gate C blocks A from going up; move C left twice then A up
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:1,col:2,len:2,dir:'v'},
+    {id:2,row:0,col:2,len:2,dir:'h'},
+    {id:3,row:0,col:4,len:2,dir:'v'},
+    {id:4,row:3,col:0,len:3,dir:'h'},
+    {id:5,row:4,col:1,len:2,dir:'h'},
+    {id:6,row:5,col:0,len:2,dir:'h'},
+    {id:7,row:3,col:4,len:2,dir:'v'},
+  ],
+  // Level 15 — two horizontal blockers and a gatekeeper
+  [
+    {id:0,row:2,col:1,len:2,dir:'h'},
+    {id:1,row:1,col:3,len:2,dir:'v'},
+    {id:2,row:0,col:1,len:2,dir:'h'},
+    {id:3,row:0,col:4,len:2,dir:'v'},
+    {id:4,row:3,col:3,len:2,dir:'h'},
+    {id:5,row:3,col:0,len:3,dir:'v'},
+    {id:6,row:4,col:1,len:2,dir:'h'},
+    {id:7,row:5,col:2,len:2,dir:'h'},
+    {id:8,row:2,col:5,len:3,dir:'v'},
+  ],
+  // Level 16 — tight upper cluster, open lower
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:0,col:2,len:2,dir:'v'},
+    {id:2,row:0,col:4,len:2,dir:'v'},
+    {id:3,row:2,col:2,len:3,dir:'v'},
+    {id:4,row:0,col:0,len:2,dir:'h'},
+    {id:5,row:5,col:2,len:2,dir:'h'},
+    {id:6,row:3,col:0,len:2,dir:'h'},
+    {id:7,row:4,col:4,len:2,dir:'v'},
+  ],
+  // Level 17 — cross-shaped blockage
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:0,col:3,len:3,dir:'v'},
+    {id:2,row:1,col:1,len:2,dir:'h'},
+    {id:3,row:2,col:4,len:2,dir:'v'},
+    {id:4,row:0,col:0,len:2,dir:'v'},
+    {id:5,row:3,col:2,len:2,dir:'h'},
+    {id:6,row:4,col:0,len:2,dir:'h'},
+    {id:7,row:5,col:1,len:3,dir:'h'},
+    {id:8,row:0,col:5,len:2,dir:'v'},
+  ],
+  // Level 18 — staircase blockers
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:1,col:2,len:2,dir:'v'},
+    {id:2,row:0,col:3,len:2,dir:'h'},
+    {id:3,row:1,col:4,len:2,dir:'v'},
+    {id:4,row:2,col:5,len:3,dir:'v'},
+    {id:5,row:0,col:0,len:2,dir:'h'},
+    {id:6,row:3,col:0,len:2,dir:'v'},
+    {id:7,row:3,col:2,len:2,dir:'h'},
+    {id:8,row:5,col:4,len:2,dir:'h'},
+    {id:9,row:5,col:1,len:3,dir:'h'},
+  ],
+  // Level 19 — double gate with side corridors
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:0,col:2,len:2,dir:'v'},
+    {id:2,row:2,col:2,len:2,dir:'v'},
+    {id:3,row:0,col:4,len:2,dir:'h'},
+    {id:4,row:1,col:5,len:2,dir:'v'},
+    {id:5,row:3,col:3,len:2,dir:'h'},
+    {id:6,row:4,col:0,len:3,dir:'h'},
+    {id:7,row:3,col:0,len:2,dir:'h'},
+    {id:8,row:0,col:0,len:2,dir:'h'},
+    {id:9,row:5,col:2,len:3,dir:'h'},
+  ],
+  // Level 20 — expert: A,C,E each blocked by a predecessor; move B,D,G,I to clear chain
+  [
+    {id:0,row:2,col:0,len:2,dir:'h'},
+    {id:1,row:0,col:2,len:3,dir:'v'},
+    {id:2,row:3,col:2,len:2,dir:'h'},
+    {id:3,row:1,col:3,len:2,dir:'v'},
+    {id:4,row:0,col:3,len:2,dir:'h'},
+    {id:5,row:2,col:4,len:2,dir:'v'},
+    {id:6,row:0,col:0,len:2,dir:'v'},
+    {id:7,row:4,col:0,len:3,dir:'h'},
+    {id:8,row:5,col:3,len:2,dir:'h'},
+    {id:9,row:3,col:5,len:2,dir:'v'},
+  ],
 ];
 
 const CAR_COLORS = ['#e05252','#52a0e0','#52e07c','#e0c452','#e07c52','#a052e0','#52e0d0','#e052b0','#8de052','#c0c0c0'];

@@ -54,10 +54,11 @@
   <div id="status"></div>
   <div class="controls">
     <button id="btn-flip" data-i18n="btn.flip">Flip</button>
+    <button id="btn-theme">Liberty</button>
   </div>
   <div id="tally">
-    <span><strong id="heads-count">0</strong>Heads ☀</span>
-    <span><strong id="tails-count">0</strong>Tails ☽</span>
+    <span><strong id="heads-count">0</strong><span id="heads-label">HEADS</span></span>
+    <span><strong id="tails-count">0</strong><span id="tails-label">TAILS</span></span>
   </div>
   <p class="hint" data-i18n="hint.coin-flip">Press Flip or tap the coin</p>
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
