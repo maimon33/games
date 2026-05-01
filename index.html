@@ -202,6 +202,7 @@
     [data-cat="spatial"]   { --c-accent: #52e0d0; }
     [data-cat="arcade"]    { --c-accent: #e052b0; }
     [data-cat="utility"]   { --c-accent: #52a0e0; }
+    [data-mp="1"]          { --c-accent: #f0a030; }
 
     /* ── Section divider ── */
     .section-divider {
@@ -224,7 +225,7 @@
     </div>
     <h1>Maimon's Games</h1>
     <p data-i18n="hub.tagline">Think. Solve. Play.</p>
-    <div class="hero-meta"><span>22</span><span data-i18n="hub.meta"> games &amp; tools · pure browser · no login</span></div>
+    <div class="hero-meta"><span>26</span><span data-i18n="hub.meta"> games &amp; tools · pure browser · no login</span></div>
   </div>
 
   <div class="filters">
@@ -236,9 +237,40 @@
     <div class="pill" data-filter="spatial" data-i18n="filter.spatial">Spatial</div>
     <div class="pill" data-filter="deduction" data-i18n="filter.deduction">Deduction</div>
     <div class="pill" data-filter="utility" data-i18n="filter.utility">Utilities</div>
+    <div class="pill" data-filter="multiplayer" data-i18n="filter.multiplayer">2-Player</div>
   </div>
 
   <main class="grid">
+    <a class="card" href="games/chess/" data-cat="logic" data-mp="1">
+      <span class="card-icon">♟</span>
+      <h2 data-i18n="game.chess">Chess</h2>
+      <p data-i18n="desc.chess">Classic chess. Play locally or invite a friend for online turn-based play.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.multiplayer">2-player</span><span class="badge-new" data-i18n="badge.new">New</span></div>
+    </a>
+    <a class="card" href="games/checkers/" data-cat="logic" data-mp="1">
+      <span class="card-icon">🔴</span>
+      <h2 data-i18n="game.checkers">Checkers</h2>
+      <p data-i18n="desc.checkers">Classic draughts. Jump and capture your opponent's pieces. Invite a friend to play online.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.multiplayer">2-player</span><span class="badge-new" data-i18n="badge.new">New</span></div>
+    </a>
+    <a class="card" href="games/connect-four/" data-cat="logic" data-mp="1">
+      <span class="card-icon">🟡</span>
+      <h2 data-i18n="game.connect-four">Connect Four</h2>
+      <p data-i18n="desc.connect-four">Drop discs to connect four in a row. Play locally or invite a friend online.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.multiplayer">2-player</span><span class="badge-new" data-i18n="badge.new">New</span></div>
+    </a>
+    <a class="card" href="games/battleship/" data-cat="deduction" data-mp="1">
+      <span class="card-icon">🚢</span>
+      <h2 data-i18n="game.battleship">Battleship</h2>
+      <p data-i18n="desc.battleship">Place your fleet and sink the enemy's ships. Turn-based naval combat for two players.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.multiplayer">2-player</span><span class="badge-new" data-i18n="badge.new">New</span></div>
+    </a>
+    <a class="card" href="games/backgammon/" data-cat="logic" data-mp="1">
+      <span class="card-icon">🎯</span>
+      <h2 data-i18n="game.backgammon">Backgammon</h2>
+      <p data-i18n="desc.backgammon">Roll dice and race your pieces home. Bear off all 15 before your opponent. Invite a friend online.</p>
+      <div class="card-footer"><span class="tag" data-i18n="tag.multiplayer">2-player</span><span class="badge-new" data-i18n="badge.new">New</span></div>
+    </a>
     <a class="card" href="games/maze/" data-cat="logic">
       <span class="card-icon">🌀</span>
       <h2 data-i18n="game.maze">Maze</h2>
@@ -384,7 +416,8 @@
         pill.classList.add('active');
         const f = pill.dataset.filter;
         document.querySelectorAll('.card').forEach(card => {
-          card.style.display = (f === 'all' || card.dataset.cat === f) ? '' : 'none';
+          const match = f === 'all' || card.dataset.cat === f || (f === 'multiplayer' && card.dataset.mp === '1');
+          card.style.display = match ? '' : 'none';
         });
         document.querySelectorAll('.section-divider').forEach(d => {
           d.style.display = (f === 'all' || f === d.dataset.section) ? '' : 'none';
