@@ -136,15 +136,18 @@ function ptX(pt, {PW, BAR_X, BAR_W}) {
 
 function ptTop(pt) { return pt >= 13 && pt <= 24; }
 
-function pieceY(stackIdx, top, {H, PIECE_R}) {
-  return top ? PIECE_R + stackIdx*PIECE_R*1.9 : H - PIECE_R - stackIdx*PIECE_R*1.9;
+function pieceY(i, count, top, {H, PIECE_R}) {
+  // Compress spacing so all pieces stay within their half of the board
+  const available = H / 2 - PIECE_R * 2.2;
+  const spacing = count <= 1 ? PIECE_R * 1.9 : Math.min(PIECE_R * 1.9, available / count);
+  return top ? PIECE_R * 1.1 + i * spacing : H - PIECE_R * 1.1 - i * spacing;
 }
 
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const W = Math.min(window.innerWidth - 32, 700);
-  canvas.width = W; canvas.height = Math.round(W * 0.62);
+  const W = Math.min(window.innerWidth - 32, 1000);
+  canvas.width = W; canvas.height = Math.round(W * 0.65);
   draw();
 }
 
@@ -210,25 +213,25 @@ function draw() {
   for (let pt = 1; pt <= 24; pt++) {
     const cell = board.pts[pt]; if (!cell.color || !cell.count) continue;
     const x = ptX(pt, L), top = ptTop(pt);
-    for (let i = 0; i < Math.min(cell.count, 8); i++) {
-      drawPiece(x, pieceY(i, top, L), PIECE_R, cell.color, pt === selected);
+    for (let i = 0; i < cell.count; i++) {
+      drawPiece(x, pieceY(i, cell.count, top, L), PIECE_R, cell.color, pt === selected);
     }
-    if (cell.count > 5) {
-      ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(PIECE_R*0.8)}px system-ui`; ctx.textAlign = 'center';
-      ctx.fillText(cell.count, x, pieceY(Math.min(cell.count-1,4), top, L));
+    if (cell.count > 9) {
+      ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(PIECE_R * 0.75)}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText(cell.count, x, pieceY(cell.count - 1, cell.count, top, L));
     }
   }
 
   // Bar pieces
   [[board.bar.w,'w'],[board.bar.b,'b']].forEach(([n, c]) => {
-    for (let i=0;i<Math.min(n,4);i++) {
-      const y = c==='w' ? H/2 - PIECE_R - i*PIECE_R*1.9 : H/2 + PIECE_R + i*PIECE_R*1.9;
-      drawPiece(BAR_X + BAR_W/2, y, PIECE_R, c, selected==='bar');
-    }
-    if (n) {
-      ctx.fillStyle = '#fff'; ctx.font = `${Math.round(PIECE_R)}px system-ui`; ctx.textAlign = 'center';
-      const y = c==='w' ? H/2-PIECE_R*0.3 : H/2+PIECE_R*1.3;
-      ctx.fillText(n+'×', BAR_X + BAR_W/2, y);
+    if (!n) return;
+    const available = H / 2 - PIECE_R * 2.2;
+    const spacing = n <= 1 ? PIECE_R * 1.9 : Math.min(PIECE_R * 1.9, available / n);
+    for (let i = 0; i < n; i++) {
+      const y = c === 'w'
+        ? H/2 - PIECE_R * 1.1 - i * spacing
+        : H/2 + PIECE_R * 1.1 + i * spacing;
+      drawPiece(BAR_X + BAR_W/2, y, PIECE_R, c, selected === 'bar');
     }
   });
 
