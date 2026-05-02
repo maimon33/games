@@ -114,15 +114,16 @@ function applyMoveLocal(board, color, from, to, dieIdx, dice) {
 
 // ── Canvas geometry ───────────────────────────────────────────────────────────
 
-const BAR_FRAC = 0.07, OFF_W = 28;
+const BAR_FRAC = 0.07;
 
 function layout() {
   const W = canvas.width, H = canvas.height;
-  const BAR_W = Math.round(W * BAR_FRAC);
-  const PW = (W - BAR_W - OFF_W) / 12;
-  const BAR_X = 6 * PW;
+  const BAR_W  = Math.round(W * BAR_FRAC);
+  const OFF_W  = Math.round(W * 0.055);
+  const PW     = (W - BAR_W - OFF_W) / 12;
+  const BAR_X  = 6 * PW;
   const PIECE_R = PW * 0.42;
-  return { W, H, BAR_W, PW, BAR_X, PIECE_R };
+  return { W, H, BAR_W, PW, BAR_X, PIECE_R, OFF_W };
 }
 
 function ptX(pt, {PW, BAR_X, BAR_W}) {
@@ -142,8 +143,8 @@ function pieceY(stackIdx, top, {H, PIECE_R}) {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const W = Math.min(window.innerWidth - 32, 560);
-  canvas.width = W; canvas.height = Math.round(W * 320/560);
+  const W = Math.min(window.innerWidth - 32, 700);
+  canvas.width = W; canvas.height = Math.round(W * 0.62);
   draw();
 }
 
@@ -157,7 +158,7 @@ function drawPiece(x, y, R, color, sel) {
 function draw() {
   if (!state) return;
   const L = layout();
-  const { W, H, BAR_W, PW, BAR_X, PIECE_R } = L;
+  const { W, H, BAR_W, PW, BAR_X, PIECE_R, OFF_W } = L;
   const board = myBoard || state;
 
   ctx.fillStyle = '#1a5c2a'; ctx.fillRect(0, 0, W, H);
@@ -246,7 +247,7 @@ function tapTarget(cx, cy) {
   const x = (cx - rect.left) * (canvas.width / rect.width);
   const y = (cy - rect.top)  * (canvas.height / rect.height);
   const L = layout();
-  const { W, H, BAR_W, PW, BAR_X, PIECE_R } = L;
+  const { W, H, BAR_W, PW, BAR_X, PIECE_R, OFF_W } = L;
 
   if (x >= W - OFF_W) return 'off';
 
