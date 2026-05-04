@@ -1,240 +1,332 @@
-// Traffic Jam — Rush Hour clone
-// Grid: 6x6. Red car (id=0) is horizontal, must reach column 4-5 (exit on row 2, right wall).
+// Traffic Jam — Rush Hour clone with multiple board families.
 // Each level: array of {id, row, col, len, dir} where dir='h'|'v'
 
-const LEVELS = [
-  // Level 1 — trivial
-  [
-    {id:0,row:2,col:1,len:2,dir:'h'},  // red car
-    {id:1,row:0,col:2,len:2,dir:'v'},
-    {id:2,row:3,col:1,len:2,dir:'h'},
-  ],
-  // Level 2
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:3,dir:'v'},
-    {id:2,row:2,col:3,len:2,dir:'v'},
-    {id:3,row:4,col:0,len:3,dir:'h'},
-  ],
-  // Level 3
-  [
-    {id:0,row:2,col:1,len:2,dir:'h'},
-    {id:1,row:0,col:3,len:2,dir:'v'},
-    {id:2,row:2,col:3,len:2,dir:'v'},
-    {id:3,row:1,col:0,len:2,dir:'h'},
-    {id:4,row:4,col:1,len:3,dir:'h'},
-  ],
-  // Level 4
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:3,len:2,dir:'v'},
-    {id:2,row:0,col:4,len:2,dir:'v'},
-    {id:3,row:2,col:2,len:2,dir:'v'},
-    {id:4,row:2,col:4,len:2,dir:'v'},
-    {id:5,row:4,col:0,len:3,dir:'h'},
-  ],
-  // Level 5
-  [
-    {id:0,row:2,col:1,len:2,dir:'h'},
-    {id:1,row:0,col:0,len:3,dir:'v'},
-    {id:2,row:0,col:3,len:2,dir:'h'},
-    {id:3,row:1,col:3,len:2,dir:'v'},
-    {id:4,row:3,col:5,len:2,dir:'v'},
-    {id:5,row:4,col:1,len:2,dir:'h'},
-    {id:6,row:3,col:4,len:2,dir:'v'},
-  ],
-  // Level 6
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:4,len:3,dir:'v'},
-    {id:3,row:2,col:2,len:2,dir:'v'},
-    {id:4,row:3,col:0,len:2,dir:'h'},
-    {id:5,row:4,col:2,len:2,dir:'h'},
-    {id:6,row:5,col:0,len:3,dir:'h'},
-  ],
-  // Level 7
-  [
-    {id:0,row:2,col:1,len:2,dir:'h'},
-    {id:1,row:0,col:0,len:2,dir:'v'},
-    {id:2,row:0,col:2,len:2,dir:'v'},
-    {id:3,row:0,col:4,len:2,dir:'h'},
-    {id:4,row:1,col:4,len:2,dir:'v'},
-    {id:5,row:2,col:3,len:3,dir:'v'},
-    {id:6,row:4,col:0,len:2,dir:'h'},
-    {id:7,row:5,col:2,len:3,dir:'h'},
-  ],
-  // Level 8
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:4,len:2,dir:'h'},
-    {id:3,row:1,col:3,len:2,dir:'v'},
-    {id:4,row:3,col:2,len:2,dir:'h'},
-    {id:5,row:2,col:4,len:3,dir:'v'},
-    {id:6,row:3,col:0,len:3,dir:'v'},
-    {id:7,row:4,col:1,len:2,dir:'h'},
-    {id:8,row:5,col:3,len:3,dir:'h'},
-  ],
-  // Level 9
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:1,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:0,len:2,dir:'h'},
-    {id:3,row:1,col:4,len:2,dir:'v'},
-    {id:4,row:0,col:3,len:2,dir:'v'},
-    {id:5,row:3,col:1,len:2,dir:'h'},
-    {id:6,row:3,col:3,len:2,dir:'v'},
-    {id:7,row:4,col:0,len:2,dir:'v'},
-    {id:8,row:4,col:4,len:2,dir:'v'},
-  ],
-  // Level 10
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:1,len:2,dir:'h'},
-    {id:2,row:0,col:4,len:2,dir:'v'},
-    {id:3,row:1,col:2,len:2,dir:'v'},
-    {id:4,row:2,col:3,len:2,dir:'v'},
-    {id:5,row:3,col:0,len:2,dir:'v'},
-    {id:6,row:3,col:4,len:2,dir:'v'},
-    {id:7,row:4,col:1,len:2,dir:'h'},
-    {id:8,row:5,col:2,len:2,dir:'h'},
-    {id:9,row:5,col:4,len:2,dir:'h'},
-  ],
-  // Level 11 — move C left, A down twice to clear col 2
-  // Grid: A(0,2)v3 blocks row2. C(4,2)h2 blocks A going down. D(3,4)v2 filler.
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:3,dir:'v'},
-    {id:2,row:0,col:0,len:2,dir:'h'},
-    {id:3,row:4,col:2,len:2,dir:'h'},
-    {id:4,row:3,col:4,len:2,dir:'v'},
-    {id:5,row:4,col:0,len:2,dir:'h'},
-  ],
-  // Level 12 — A(1,2)v2 blocks col2; B(2,3)v3 blocks col3; unblock each then exit
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:1,col:2,len:2,dir:'v'},
-    {id:2,row:2,col:3,len:3,dir:'v'},
-    {id:3,row:0,col:0,len:2,dir:'h'},
-    {id:4,row:0,col:3,len:2,dir:'h'},
-    {id:5,row:4,col:0,len:3,dir:'h'},
-    {id:6,row:5,col:2,len:3,dir:'h'},
-  ],
-  // Level 13 — three vertical blockers in row 2 requiring chain of moves
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:1,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:3,len:3,dir:'v'},
-    {id:3,row:2,col:4,len:2,dir:'v'},
-    {id:4,row:0,col:0,len:2,dir:'h'},
-    {id:5,row:4,col:1,len:2,dir:'h'},
-    {id:6,row:3,col:0,len:2,dir:'v'},
-    {id:7,row:5,col:3,len:2,dir:'h'},
-  ],
-  // Level 14 — gate C blocks A from going up; move C left twice then A up
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:1,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:2,len:2,dir:'h'},
-    {id:3,row:0,col:4,len:2,dir:'v'},
-    {id:4,row:3,col:0,len:3,dir:'h'},
-    {id:5,row:4,col:1,len:2,dir:'h'},
-    {id:6,row:5,col:0,len:2,dir:'h'},
-    {id:7,row:3,col:4,len:2,dir:'v'},
-  ],
-  // Level 15 — two horizontal blockers and a gatekeeper
-  [
-    {id:0,row:2,col:1,len:2,dir:'h'},
-    {id:1,row:1,col:3,len:2,dir:'v'},
-    {id:2,row:0,col:1,len:2,dir:'h'},
-    {id:3,row:0,col:4,len:2,dir:'v'},
-    {id:4,row:3,col:3,len:2,dir:'h'},
-    {id:5,row:3,col:0,len:3,dir:'v'},
-    {id:6,row:4,col:1,len:2,dir:'h'},
-    {id:7,row:5,col:2,len:2,dir:'h'},
-    {id:8,row:2,col:5,len:3,dir:'v'},
-  ],
-  // Level 16 — tight upper cluster, open lower
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:4,len:2,dir:'v'},
-    {id:3,row:2,col:2,len:3,dir:'v'},
-    {id:4,row:0,col:0,len:2,dir:'h'},
-    {id:5,row:5,col:2,len:2,dir:'h'},
-    {id:6,row:3,col:0,len:2,dir:'h'},
-    {id:7,row:4,col:4,len:2,dir:'v'},
-  ],
-  // Level 17 — cross-shaped blockage
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:3,len:3,dir:'v'},
-    {id:2,row:1,col:1,len:2,dir:'h'},
-    {id:3,row:2,col:4,len:2,dir:'v'},
-    {id:4,row:0,col:0,len:2,dir:'v'},
-    {id:5,row:3,col:2,len:2,dir:'h'},
-    {id:6,row:4,col:0,len:2,dir:'h'},
-    {id:7,row:5,col:1,len:3,dir:'h'},
-    {id:8,row:0,col:5,len:2,dir:'v'},
-  ],
-  // Level 18 — staircase blockers
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:1,col:2,len:2,dir:'v'},
-    {id:2,row:0,col:3,len:2,dir:'h'},
-    {id:3,row:1,col:4,len:2,dir:'v'},
-    {id:4,row:2,col:5,len:3,dir:'v'},
-    {id:5,row:0,col:0,len:2,dir:'h'},
-    {id:6,row:3,col:0,len:2,dir:'v'},
-    {id:7,row:3,col:2,len:2,dir:'h'},
-    {id:8,row:5,col:4,len:2,dir:'h'},
-    {id:9,row:5,col:1,len:3,dir:'h'},
-  ],
-  // Level 19 — double gate with side corridors
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:2,dir:'v'},
-    {id:2,row:2,col:2,len:2,dir:'v'},
-    {id:3,row:0,col:4,len:2,dir:'h'},
-    {id:4,row:1,col:5,len:2,dir:'v'},
-    {id:5,row:3,col:3,len:2,dir:'h'},
-    {id:6,row:4,col:0,len:3,dir:'h'},
-    {id:7,row:3,col:0,len:2,dir:'h'},
-    {id:8,row:0,col:0,len:2,dir:'h'},
-    {id:9,row:5,col:2,len:3,dir:'h'},
-  ],
-  // Level 20 — expert: A,C,E each blocked by a predecessor; move B,D,G,I to clear chain
-  [
-    {id:0,row:2,col:0,len:2,dir:'h'},
-    {id:1,row:0,col:2,len:3,dir:'v'},
-    {id:2,row:3,col:2,len:2,dir:'h'},
-    {id:3,row:1,col:3,len:2,dir:'v'},
-    {id:4,row:0,col:3,len:2,dir:'h'},
-    {id:5,row:2,col:4,len:2,dir:'v'},
-    {id:6,row:0,col:0,len:2,dir:'v'},
-    {id:7,row:4,col:0,len:3,dir:'h'},
-    {id:8,row:5,col:3,len:2,dir:'h'},
-    {id:9,row:3,col:5,len:2,dir:'v'},
-  ],
+const LEVEL_GROUPS = [
+  {
+    key: 'classic',
+    label: 'Classic 6×6',
+    grid: 6,
+    exitRow: 2,
+    levels: [
+      [
+        {id:0,row:2,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:3,col:1,len:2,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:3,dir:'v'},
+        {id:2,row:2,col:3,len:2,dir:'v'},
+        {id:3,row:4,col:0,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:3,len:2,dir:'v'},
+        {id:2,row:2,col:3,len:2,dir:'v'},
+        {id:3,row:1,col:0,len:2,dir:'h'},
+        {id:4,row:4,col:1,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:3,len:2,dir:'v'},
+        {id:2,row:0,col:4,len:2,dir:'v'},
+        {id:3,row:2,col:2,len:2,dir:'v'},
+        {id:4,row:2,col:4,len:2,dir:'v'},
+        {id:5,row:4,col:0,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:0,len:3,dir:'v'},
+        {id:2,row:0,col:3,len:2,dir:'h'},
+        {id:3,row:1,col:3,len:2,dir:'v'},
+        {id:4,row:3,col:5,len:2,dir:'v'},
+        {id:5,row:4,col:1,len:2,dir:'h'},
+        {id:6,row:3,col:4,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:4,len:3,dir:'v'},
+        {id:3,row:2,col:2,len:2,dir:'v'},
+        {id:4,row:3,col:0,len:2,dir:'h'},
+        {id:5,row:4,col:2,len:2,dir:'h'},
+        {id:6,row:5,col:0,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:0,len:2,dir:'v'},
+        {id:2,row:0,col:2,len:2,dir:'v'},
+        {id:3,row:0,col:4,len:2,dir:'h'},
+        {id:4,row:1,col:4,len:2,dir:'v'},
+        {id:5,row:2,col:3,len:3,dir:'v'},
+        {id:6,row:4,col:0,len:2,dir:'h'},
+        {id:7,row:5,col:2,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:4,len:2,dir:'h'},
+        {id:3,row:1,col:3,len:2,dir:'v'},
+        {id:4,row:3,col:2,len:2,dir:'h'},
+        {id:5,row:2,col:4,len:3,dir:'v'},
+        {id:6,row:3,col:0,len:3,dir:'v'},
+        {id:7,row:4,col:1,len:2,dir:'h'},
+        {id:8,row:5,col:3,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:1,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:0,len:2,dir:'h'},
+        {id:3,row:1,col:4,len:2,dir:'v'},
+        {id:4,row:0,col:3,len:2,dir:'v'},
+        {id:5,row:3,col:1,len:2,dir:'h'},
+        {id:6,row:3,col:3,len:2,dir:'v'},
+        {id:7,row:4,col:0,len:2,dir:'v'},
+        {id:8,row:4,col:4,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:1,len:2,dir:'h'},
+        {id:2,row:0,col:4,len:2,dir:'v'},
+        {id:3,row:1,col:2,len:2,dir:'v'},
+        {id:4,row:2,col:3,len:2,dir:'v'},
+        {id:5,row:3,col:0,len:2,dir:'v'},
+        {id:6,row:3,col:4,len:2,dir:'v'},
+        {id:7,row:4,col:1,len:2,dir:'h'},
+        {id:8,row:5,col:2,len:2,dir:'h'},
+        {id:9,row:5,col:4,len:2,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:3,dir:'v'},
+        {id:2,row:0,col:0,len:2,dir:'h'},
+        {id:3,row:4,col:2,len:2,dir:'h'},
+        {id:4,row:3,col:4,len:2,dir:'v'},
+        {id:5,row:4,col:0,len:2,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:1,col:2,len:2,dir:'v'},
+        {id:2,row:2,col:3,len:3,dir:'v'},
+        {id:3,row:0,col:0,len:2,dir:'h'},
+        {id:4,row:0,col:3,len:2,dir:'h'},
+        {id:5,row:4,col:0,len:3,dir:'h'},
+        {id:6,row:5,col:2,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:1,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:3,len:3,dir:'v'},
+        {id:3,row:2,col:4,len:2,dir:'v'},
+        {id:4,row:0,col:0,len:2,dir:'h'},
+        {id:5,row:4,col:1,len:2,dir:'h'},
+        {id:6,row:3,col:0,len:2,dir:'v'},
+        {id:7,row:5,col:3,len:2,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:1,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:2,len:2,dir:'h'},
+        {id:3,row:0,col:4,len:2,dir:'v'},
+        {id:4,row:3,col:0,len:3,dir:'h'},
+        {id:5,row:4,col:1,len:2,dir:'h'},
+        {id:6,row:5,col:0,len:2,dir:'h'},
+        {id:7,row:3,col:4,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:1,len:2,dir:'h'},
+        {id:1,row:1,col:3,len:2,dir:'v'},
+        {id:2,row:0,col:1,len:2,dir:'h'},
+        {id:3,row:0,col:4,len:2,dir:'v'},
+        {id:4,row:3,col:3,len:2,dir:'h'},
+        {id:5,row:3,col:0,len:3,dir:'v'},
+        {id:6,row:4,col:1,len:2,dir:'h'},
+        {id:7,row:5,col:2,len:2,dir:'h'},
+        {id:8,row:2,col:5,len:3,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:4,len:2,dir:'v'},
+        {id:3,row:2,col:2,len:3,dir:'v'},
+        {id:4,row:0,col:0,len:2,dir:'h'},
+        {id:5,row:5,col:2,len:2,dir:'h'},
+        {id:6,row:3,col:0,len:2,dir:'h'},
+        {id:7,row:4,col:4,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:3,len:3,dir:'v'},
+        {id:2,row:1,col:1,len:2,dir:'h'},
+        {id:3,row:2,col:4,len:2,dir:'v'},
+        {id:4,row:0,col:0,len:2,dir:'v'},
+        {id:5,row:3,col:2,len:2,dir:'h'},
+        {id:6,row:4,col:0,len:2,dir:'h'},
+        {id:7,row:5,col:1,len:3,dir:'h'},
+        {id:8,row:0,col:5,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:1,col:2,len:2,dir:'v'},
+        {id:2,row:0,col:3,len:2,dir:'h'},
+        {id:3,row:1,col:4,len:2,dir:'v'},
+        {id:4,row:2,col:5,len:3,dir:'v'},
+        {id:5,row:0,col:0,len:2,dir:'h'},
+        {id:6,row:3,col:0,len:2,dir:'v'},
+        {id:7,row:3,col:2,len:2,dir:'h'},
+        {id:8,row:5,col:4,len:2,dir:'h'},
+        {id:9,row:5,col:1,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:2,col:2,len:2,dir:'v'},
+        {id:3,row:0,col:4,len:2,dir:'h'},
+        {id:4,row:1,col:5,len:2,dir:'v'},
+        {id:5,row:3,col:3,len:2,dir:'h'},
+        {id:6,row:4,col:0,len:3,dir:'h'},
+        {id:7,row:3,col:0,len:2,dir:'h'},
+        {id:8,row:0,col:0,len:2,dir:'h'},
+        {id:9,row:5,col:2,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:2,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:3,dir:'v'},
+        {id:2,row:3,col:2,len:2,dir:'h'},
+        {id:3,row:1,col:3,len:2,dir:'v'},
+        {id:4,row:0,col:3,len:2,dir:'h'},
+        {id:5,row:2,col:4,len:2,dir:'v'},
+        {id:6,row:0,col:0,len:2,dir:'v'},
+        {id:7,row:4,col:0,len:3,dir:'h'},
+        {id:8,row:5,col:3,len:2,dir:'h'},
+        {id:9,row:3,col:5,len:2,dir:'v'},
+      ],
+    ],
+  },
+  {
+    key: 'wide',
+    label: 'Wide 7×7',
+    grid: 7,
+    exitRow: 3,
+    levels: [
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:1,col:3,len:3,dir:'v'},
+        {id:2,row:0,col:0,len:3,dir:'v'},
+        {id:3,row:0,col:4,len:2,dir:'h'},
+        {id:4,row:5,col:1,len:3,dir:'h'},
+        {id:5,row:4,col:5,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:3,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:2,dir:'v'},
+        {id:2,row:2,col:3,len:3,dir:'v'},
+        {id:3,row:0,col:5,len:2,dir:'v'},
+        {id:4,row:1,col:0,len:3,dir:'h'},
+        {id:5,row:5,col:2,len:3,dir:'h'},
+        {id:6,row:4,col:0,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:1,col:3,len:2,dir:'v'},
+        {id:2,row:0,col:4,len:3,dir:'v'},
+        {id:3,row:3,col:5,len:2,dir:'v'},
+        {id:4,row:0,col:0,len:2,dir:'h'},
+        {id:5,row:2,col:0,len:3,dir:'v'},
+        {id:6,row:5,col:3,len:3,dir:'h'},
+        {id:7,row:6,col:0,len:2,dir:'h'},
+      ],
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:3,dir:'v'},
+        {id:2,row:2,col:4,len:2,dir:'v'},
+        {id:3,row:1,col:5,len:3,dir:'v'},
+        {id:4,row:4,col:0,len:3,dir:'h'},
+        {id:5,row:5,col:3,len:2,dir:'h'},
+        {id:6,row:0,col:0,len:2,dir:'v'},
+        {id:7,row:6,col:1,len:3,dir:'h'},
+      ],
+    ],
+  },
+  {
+    key: 'mega',
+    label: 'Mega 8×8',
+    grid: 8,
+    exitRow: 3,
+    levels: [
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:3,len:4,dir:'v'},
+        {id:2,row:1,col:5,len:3,dir:'v'},
+        {id:3,row:0,col:0,len:3,dir:'v'},
+        {id:4,row:5,col:1,len:4,dir:'h'},
+        {id:5,row:6,col:6,len:2,dir:'v'},
+      ],
+      [
+        {id:0,row:3,col:0,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:3,dir:'v'},
+        {id:2,row:1,col:4,len:4,dir:'v'},
+        {id:3,row:2,col:6,len:2,dir:'v'},
+        {id:4,row:0,col:5,len:3,dir:'h'},
+        {id:5,row:5,col:0,len:3,dir:'h'},
+        {id:6,row:6,col:3,len:4,dir:'h'},
+      ],
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:3,len:2,dir:'v'},
+        {id:2,row:2,col:4,len:3,dir:'v'},
+        {id:3,row:1,col:6,len:3,dir:'v'},
+        {id:4,row:0,col:0,len:4,dir:'h'},
+        {id:5,row:4,col:0,len:3,dir:'v'},
+        {id:6,row:6,col:2,len:3,dir:'h'},
+        {id:7,row:7,col:5,len:3,dir:'h'},
+      ],
+      [
+        {id:0,row:3,col:1,len:2,dir:'h'},
+        {id:1,row:0,col:2,len:4,dir:'v'},
+        {id:2,row:1,col:4,len:3,dir:'v'},
+        {id:3,row:3,col:5,len:3,dir:'v'},
+        {id:4,row:0,col:6,len:2,dir:'v'},
+        {id:5,row:5,col:0,len:4,dir:'h'},
+        {id:6,row:6,col:4,len:3,dir:'h'},
+        {id:7,row:1,col:0,len:2,dir:'h'},
+      ],
+    ],
+  },
 ];
 
 const CAR_COLORS = ['#e05252','#52a0e0','#52e07c','#e0c452','#e07c52','#a052e0','#52e0d0','#e052b0','#8de052','#c0c0c0'];
 
-const GRID = 6;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 const levelLabel = document.getElementById('level-label');
+const sizeLabel = document.getElementById('size-label');
 
-let CELL, PAD, cars = [], selected = null, levelIdx = 0, moves = 0;
+let CELL, PAD, cars = [], selected = null, groupIdx = 0, levelIdx = 0, moves = 0;
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function currentGroup() {
+  return LEVEL_GROUPS[groupIdx];
+}
+
+function currentGrid() {
+  return currentGroup().grid;
+}
+
+function currentExitRow() {
+  return currentGroup().exitRow;
+}
+
+function currentLevels() {
+  return currentGroup().levels;
+}
 
 function resize() {
   const size = Math.min(window.innerWidth - 32, 420);
   canvas.width = canvas.height = size;
-  CELL = size / GRID;
+  CELL = size / currentGrid();
   PAD = CELL * 0.08;
   draw();
 }
@@ -244,12 +336,13 @@ function deepCopy(lvl) {
 }
 
 function buildGrid(carList) {
-  const g = Array.from({length:GRID}, () => new Array(GRID).fill(-1));
+  const grid = currentGrid();
+  const g = Array.from({length:grid}, () => new Array(grid).fill(-1));
   carList.forEach(c => {
     for (let i = 0; i < c.len; i++) {
       const r = c.dir === 'h' ? c.row : c.row + i;
       const col = c.dir === 'h' ? c.col + i : c.col;
-      if (r >= 0 && r < GRID && col >= 0 && col < GRID) g[r][col] = c.id;
+      if (r >= 0 && r < grid && col >= 0 && col < grid) g[r][col] = c.id;
     }
   });
   return g;
@@ -257,12 +350,19 @@ function buildGrid(carList) {
 
 function initLevel(idx) {
   levelIdx = idx;
-  cars = deepCopy(LEVELS[idx]);
+  cars = deepCopy(currentLevels()[idx]);
   selected = null;
   moves = 0;
   statusEl.textContent = '';
   statusEl.className = '';
-  levelLabel.textContent = t('status.level', {n: idx + 1});
+  levelLabel.textContent = `${currentGroup().label} · ${t('status.level', {n: idx + 1})}/${currentLevels().length}`;
+  sizeLabel.textContent = currentGroup().label;
+  resize();
+}
+
+function cycleGroup() {
+  groupIdx = (groupIdx + 1) % LEVEL_GROUPS.length;
+  initLevel(0);
   draw();
 }
 
@@ -279,7 +379,7 @@ function draw() {
   // Grid lines
   ctx.strokeStyle = border;
   ctx.lineWidth = 1;
-  for (let i = 0; i <= GRID; i++) {
+  for (let i = 0; i <= currentGrid(); i++) {
     ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
   }
@@ -289,7 +389,7 @@ function draw() {
   ctx.font = `bold ${CELL * 0.4}px system-ui`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('→', canvas.width - CELL * 0.25, 2.5 * CELL);
+  ctx.fillText('→', canvas.width - CELL * 0.25, (currentExitRow() + 0.5) * CELL);
 
   // Cars
   cars.forEach(c => {
@@ -329,17 +429,22 @@ function carAt(r, c) {
 }
 
 function tryMove(car, dir) {
+  const grid = currentGrid();
   // dir: -1 or +1
   const g = buildGrid(cars);
   const steps = dir > 0 ? 1 : -1;
   if (car.dir === 'h') {
     const checkCol = dir > 0 ? car.col + car.len : car.col - 1;
-    if (checkCol < 0 || checkCol >= GRID) return false;
+    if (car.id === 0 && dir > 0 && car.row === currentExitRow() && checkCol === grid) {
+      moves++;
+      return 'exit';
+    }
+    if (checkCol < 0 || checkCol >= grid) return false;
     if (g[car.row][checkCol] !== -1) return false;
     car.col += steps;
   } else {
     const checkRow = dir > 0 ? car.row + car.len : car.row - 1;
-    if (checkRow < 0 || checkRow >= GRID) return false;
+    if (checkRow < 0 || checkRow >= grid) return false;
     if (g[checkRow][car.col] !== -1) return false;
     car.row += steps;
   }
@@ -349,7 +454,7 @@ function tryMove(car, dir) {
 
 function checkWin() {
   const red = cars.find(c => c.id === 0);
-  return red && red.dir === 'h' && red.col + red.len >= GRID;
+  return red && red.dir === 'h' && red.row === currentExitRow() && red.col + red.len >= currentGrid();
 }
 
 canvas.addEventListener('click', e => {
@@ -361,7 +466,7 @@ canvas.addEventListener('click', e => {
   const my = (e.clientY - rect.top) * scaleY;
   const col = Math.floor(mx / CELL);
   const row = Math.floor(my / CELL);
-  if (row < 0 || row >= GRID || col < 0 || col >= GRID) return;
+  if (row < 0 || row >= currentGrid() || col < 0 || col >= currentGrid()) return;
 
   const clicked = carAt(row, col);
 
@@ -382,8 +487,10 @@ canvas.addEventListener('click', e => {
       const dir = diff > 0 ? 1 : -1;
       let moved = false;
       for (let i = 0; i < Math.abs(diff); i++) {
-        if (!tryMove(selCar, dir)) break;
+        const step = tryMove(selCar, dir);
+        if (!step) break;
         moved = true;
+        if (step === 'exit') break;
       }
       if (moved) { selected = null; draw(); if (checkWin()) win(); return; }
     }
@@ -393,8 +500,10 @@ canvas.addEventListener('click', e => {
       const dir = diff > 0 ? 1 : -1;
       let moved = false;
       for (let i = 0; i < Math.abs(diff); i++) {
-        if (!tryMove(selCar, dir)) break;
+        const step = tryMove(selCar, dir);
+        if (!step) break;
         moved = true;
+        if (step === 'exit') break;
       }
       if (moved) { selected = null; draw(); if (checkWin()) win(); return; }
     }
@@ -447,11 +556,17 @@ canvas.addEventListener('touchend', e => {
   if (selCar.dir === 'h' && Math.abs(dx) > Math.abs(dy)) {
     const steps = Math.round(dx / CELL);
     const dir = steps > 0 ? 1 : -1;
-    for (let i = 0; i < Math.abs(steps); i++) { if (!tryMove(selCar, dir)) break; }
+    for (let i = 0; i < Math.abs(steps); i++) {
+      const step = tryMove(selCar, dir);
+      if (!step || step === 'exit') break;
+    }
   } else if (selCar.dir === 'v' && Math.abs(dy) > Math.abs(dx)) {
     const steps = Math.round(dy / CELL);
     const dir = steps > 0 ? 1 : -1;
-    for (let i = 0; i < Math.abs(steps); i++) { if (!tryMove(selCar, dir)) break; }
+    for (let i = 0; i < Math.abs(steps); i++) {
+      const step = tryMove(selCar, dir);
+      if (!step) break;
+    }
   }
   selected = null;
   draw();
@@ -468,7 +583,8 @@ function win() {
 
 document.getElementById('btn-reset').addEventListener('click', () => initLevel(levelIdx));
 document.getElementById('btn-prev').addEventListener('click', () => { if (levelIdx > 0) initLevel(levelIdx - 1); });
-document.getElementById('btn-next').addEventListener('click', () => { if (levelIdx < LEVELS.length - 1) initLevel(levelIdx + 1); });
+document.getElementById('btn-next').addEventListener('click', () => { if (levelIdx < currentLevels().length - 1) initLevel(levelIdx + 1); });
+document.getElementById('btn-size').addEventListener('click', cycleGroup);
 
 function onThemeChange() { draw(); }
 

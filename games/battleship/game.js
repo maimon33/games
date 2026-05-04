@@ -2,13 +2,44 @@
 // Phase 1 (placement): serial — host places, then guest places.
 // Phase 2 (battle): alternate shots. Ship positions in shared state (casual play).
 
-const GRID = 10;
-const SHIPS = [
-  { name:'Carrier',    len:5 },
-  { name:'Battleship', len:4 },
-  { name:'Cruiser',    len:3 },
-  { name:'Submarine',  len:3 },
-  { name:'Destroyer',  len:2 },
+const PRESETS = [
+  {
+    key: 'quick',
+    label: 'Quick 8×8',
+    boardSize: 8,
+    ships: [
+      { name:'Cruiser',   len:4 },
+      { name:'Frigate',   len:3 },
+      { name:'Submarine', len:3 },
+      { name:'Patrol',    len:2 },
+      { name:'Patrol II', len:2 },
+    ],
+  },
+  {
+    key: 'classic',
+    label: 'Classic 10×10',
+    boardSize: 10,
+    ships: [
+      { name:'Carrier',    len:5 },
+      { name:'Battleship', len:4 },
+      { name:'Cruiser',    len:3 },
+      { name:'Submarine',  len:3 },
+      { name:'Destroyer',  len:2 },
+    ],
+  },
+  {
+    key: 'armada',
+    label: 'Armada 12×12',
+    boardSize: 12,
+    ships: [
+      { name:'Carrier',     len:5 },
+      { name:'Battleship',  len:4 },
+      { name:'Cruiser',     len:4 },
+      { name:'Submarine',   len:3 },
+      { name:'Destroyer',   len:3 },
+      { name:'Scout',       len:2 },
+    ],
+  },
 ];
 
 const myCanvas    = document.getElementById('my-grid');
@@ -18,20 +49,42 @@ const enemyCtx    = enemyCanvas.getContext('2d');
 const statusEl    = document.getElementById('status');
 const roomEl      = document.getElementById('room-id');
 const colorEl     = document.getElementById('color-label');
+const sizeLabelEl = document.getElementById('size-label');
 const placementUI = document.getElementById('placement-ui');
 const shipListEl  = document.getElementById('ship-list');
 const btnReady    = document.getElementById('btn-ready');
 const btnRotate   = document.getElementById('btn-rotate');
+const btnSize     = document.getElementById('btn-size');
 const enemyWrap   = document.getElementById('enemy-wrap');
 
 let CELL, state, myColor, myRole, roomId, stopPoll;
+let presetIdx = 1;
 let placing = { shipIdx: 0, horiz: true, preview: null, placed: [] };
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-function newState() {
+function presetState() {
+  return PRESETS[presetIdx];
+}
+
+function activeBoardSize() {
+  return state?.boardSize || presetState().boardSize;
+}
+
+function activeShips() {
+  return state?.ships || presetState().ships;
+}
+
+function syncSizeLabel() {
+  sizeLabelEl.textContent = presetState().label;
+  btnSize.textContent = presetState().label;
+}
+
+function stateFromPreset(preset) {
   return {
     phase: 'placement',
+    boardSize: preset.boardSize,
+    ships: preset.ships.map(ship => ({ ...ship })),
     hostShips: null, guestShips: null,
     hostShots: [], guestShots: [],
     winner: null,
@@ -57,9 +110,10 @@ function shipOccupies(ships, r, c) {
 }
 
 function canPlace(placed, r, c, len, horiz) {
+  const grid = activeBoardSize();
   for (let i = 0; i < len; i++) {
     const nr = horiz ? r : r + i, nc = horiz ? c + i : c;
-    if (nr < 0 || nr >= GRID || nc < 0 || nc >= GRID) return false;
+    if (nr < 0 || nr >= grid || nc < 0 || nc >= grid) return false;
     if (shipOccupies(placed, nr, nc)) return false;
   }
   return true;
@@ -78,8 +132,9 @@ function allSunk(ships, shots) {
 // ── Placement UI ──────────────────────────────────────────────────────────────
 
 function buildShipList() {
+  const ships = activeShips();
   shipListEl.innerHTML = '';
-  SHIPS.forEach((s, i) => {
+  ships.forEach((s, i) => {
     const btn = document.createElement('button');
     btn.className = 'ship-btn' + (i === placing.shipIdx ? ' active' : '') + (placing.placed[i] ? ' placed' : '');
     btn.textContent = `${s.name} (${s.len})`;
@@ -89,14 +144,15 @@ function buildShipList() {
 }
 
 function checkReadyBtn() {
-  btnReady.disabled = placing.placed.length < SHIPS.length;
+  btnReady.disabled = placing.placed.filter(Boolean).length < activeShips().length;
 }
 
 btnRotate.addEventListener('click', () => { placing.horiz = !placing.horiz; drawMyGrid(); });
 
 btnReady.addEventListener('click', async () => {
-  if (!roomId || placing.placed.length < SHIPS.length) return;
-  const ships = SHIPS.map((s, i) => ({ ...placing.placed[i], len: s.len, name: s.name }));
+  const fleet = activeShips();
+  if (!roomId || placing.placed.filter(Boolean).length < fleet.length) return;
+  const ships = fleet.map((s, i) => ({ ...placing.placed[i], len: s.len, name: s.name }));
   const newSt = { ...state };
   if (myRole === 'host') newSt.hostShips = ships;
   else { newSt.guestShips = ships; newSt.phase = 'battle'; }
@@ -112,8 +168,10 @@ btnReady.addEventListener('click', async () => {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const sz = Math.min(Math.floor((window.innerWidth - 72) / 2), 220);
-  CELL = sz / GRID;
+  const grid = activeBoardSize();
+  const base = window.innerWidth < 860 ? window.innerWidth - 56 : Math.floor((window.innerWidth - 112) / 2);
+  const sz = Math.min(Math.max(220, base), 320);
+  CELL = sz / grid;
   myCanvas.width = myCanvas.height = sz;
   enemyCanvas.width = enemyCanvas.height = sz;
   drawAll();
@@ -121,7 +179,7 @@ function resize() {
 
 function drawGrid(ctx, size) {
   ctx.strokeStyle = 'rgba(100,120,160,0.4)'; ctx.lineWidth = 0.5;
-  for (let i = 0; i <= GRID; i++) {
+  for (let i = 0; i <= activeBoardSize(); i++) {
     ctx.beginPath(); ctx.moveTo(i*CELL, 0); ctx.lineTo(i*CELL, size); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0, i*CELL); ctx.lineTo(size, i*CELL); ctx.stroke();
   }
@@ -163,10 +221,10 @@ function drawMyGrid() {
 
   if (state?.phase === 'placement') {
     // Draw already-placed ships
-    placing.placed.forEach((s, i) => s && drawShip(myCtx, { ...s, len: SHIPS[i].len }, 0.85));
+    placing.placed.forEach((s, i) => s && drawShip(myCtx, { ...s, len: activeShips()[i].len }, 0.85));
     // Draw preview
     if (placing.preview) {
-      const { r, c } = placing.preview, s = SHIPS[placing.shipIdx];
+      const { r, c } = placing.preview, s = activeShips()[placing.shipIdx];
       const ok = canPlace(placing.placed.filter(Boolean), r, c, s.len, placing.horiz);
       myCtx.globalAlpha = 0.5;
       myCtx.fillStyle = ok ? '#52a0e0' : '#e05252';
@@ -244,6 +302,9 @@ let myTurnFlag = false;
 
 function syncState(room) {
   state = room.state;
+  const roomPreset = PRESETS.findIndex(p => p.boardSize === state.boardSize);
+  if (roomPreset !== -1) presetIdx = roomPreset;
+  syncSizeLabel();
   myTurnFlag = room.turn === MP.myToken();
 
   if (state.phase === 'battle') {
@@ -268,7 +329,8 @@ function gridCell(canvas, clientX, clientY) {
 myCanvas.addEventListener('mousemove', e => {
   if (state?.phase !== 'placement') return;
   const [r, c] = gridCell(myCanvas, e.clientX, e.clientY);
-  if (r >= 0 && r < GRID && c >= 0 && c < GRID) { placing.preview = { r, c }; drawMyGrid(); }
+  const grid = activeBoardSize();
+  if (r >= 0 && r < grid && c >= 0 && c < grid) { placing.preview = { r, c }; drawMyGrid(); }
 });
 myCanvas.addEventListener('mouseleave', () => { placing.preview = null; drawMyGrid(); });
 
@@ -276,12 +338,12 @@ myCanvas.addEventListener('click', e => {
   if (state?.phase !== 'placement') return;
   if (placing.placed[placing.shipIdx]) return;
   const [r, c] = gridCell(myCanvas, e.clientX, e.clientY);
-  const s = SHIPS[placing.shipIdx];
+  const s = activeShips()[placing.shipIdx];
   if (!canPlace(placing.placed.filter(Boolean), r, c, s.len, placing.horiz)) return;
 
   placing.placed[placing.shipIdx] = { r, c, horiz: placing.horiz };
   // Move to next unplaced ship
-  const next = SHIPS.findIndex((_, i) => i > placing.shipIdx && !placing.placed[i]);
+  const next = activeShips().findIndex((_, i) => i > placing.shipIdx && !placing.placed[i]);
   if (next !== -1) placing.shipIdx = next;
   buildShipList(); checkReadyBtn(); drawMyGrid();
 });
@@ -291,10 +353,10 @@ myCanvas.addEventListener('touchend', e => {
   const t = e.changedTouches[0]; if (!t) return;
   if (state?.phase !== 'placement') return;
   const [r, c] = gridCell(myCanvas, t.clientX, t.clientY);
-  const s = SHIPS[placing.shipIdx];
+  const s = activeShips()[placing.shipIdx];
   if (!canPlace(placing.placed.filter(Boolean), r, c, s.len, placing.horiz)) return;
   placing.placed[placing.shipIdx] = { r, c, horiz: placing.horiz };
-  const next = SHIPS.findIndex((_, i) => i > placing.shipIdx && !placing.placed[i]);
+  const next = activeShips().findIndex((_, i) => i > placing.shipIdx && !placing.placed[i]);
   if (next !== -1) placing.shipIdx = next;
   buildShipList(); checkReadyBtn(); drawMyGrid();
 }, { passive: false });
@@ -326,13 +388,15 @@ async function fireShot(r, c) {
 
 enemyCanvas.addEventListener('click', e => {
   const [r, c] = gridCell(enemyCanvas, e.clientX, e.clientY);
-  if (r >= 0 && r < GRID && c >= 0 && c < GRID) fireShot(r, c);
+  const grid = activeBoardSize();
+  if (r >= 0 && r < grid && c >= 0 && c < grid) fireShot(r, c);
 });
 enemyCanvas.addEventListener('touchend', e => {
   e.preventDefault();
   const t = e.changedTouches[0]; if (!t) return;
   const [r, c] = gridCell(enemyCanvas, t.clientX, t.clientY);
-  if (r >= 0 && r < GRID && c >= 0 && c < GRID) fireShot(r, c);
+  const grid = activeBoardSize();
+  if (r >= 0 && r < grid && c >= 0 && c < grid) fireShot(r, c);
 }, { passive: false });
 
 // ── Multiplayer ───────────────────────────────────────────────────────────────
@@ -354,16 +418,20 @@ async function initMultiplayer() {
     try {
       const { room, role: r } = await MP.joinRoom(rid);
       roomId = rid; myRole = r === 'spectator' ? null : r;
+      state = room.state;
+      const roomPreset = PRESETS.findIndex(p => p.boardSize === state.boardSize);
+      if (roomPreset !== -1) presetIdx = roomPreset;
       myColor = myRole === 'host' ? 'Blue' : 'Red';
       myTurnFlag = room.turn === MP.myToken();
-      state = room.state;
       roomEl.textContent  = rid;
       colorEl.textContent = myRole ? `(${myRole === 'host' ? 'Host' : 'Guest'})` : '(Spectator)';
       if (myRole === 'host' && !room.guest) statusEl.textContent = 'Waiting for opponent…';
       if (state.phase === 'battle') { enemyWrap.style.display = ''; placementUI.style.display = 'none'; }
       startPolling();
-    } catch { state = newState(); statusEl.textContent = 'Room not found.'; }
-  } else { state = newState(); }
+    } catch { state = stateFromPreset(presetState()); statusEl.textContent = 'Room not found.'; }
+  } else { state = stateFromPreset(presetState()); }
+  syncSizeLabel();
+  buildShipList();
   updateStatus(); drawAll();
 }
 
@@ -372,10 +440,11 @@ document.getElementById('btn-new').addEventListener('click', () => {
   roomId = null; myRole = null; myColor = null; myTurnFlag = false;
   roomEl.textContent = '—'; colorEl.textContent = '';
   enemyWrap.style.display = 'none';
-  state = newState();
+  state = stateFromPreset(presetState());
   history.replaceState({}, '', location.pathname);
   resetPlacement();
   placementUI.style.display = '';
+  syncSizeLabel();
   updateStatus(); drawAll();
 });
 
@@ -385,7 +454,7 @@ document.getElementById('btn-invite').addEventListener('click', async () => {
     MP.showInviteModal({ id: roomId, url, qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}` });
     return;
   }
-  state = newState(); resetPlacement();
+  state = stateFromPreset(presetState()); resetPlacement();
   try {
     const { id, url, qrUrl } = await MP.createRoom('battleship', state);
     roomId = id; myRole = 'host'; myTurnFlag = true;
@@ -396,7 +465,18 @@ document.getElementById('btn-invite').addEventListener('click', async () => {
   } catch (e) { statusEl.textContent = `Error: ${e.message}`; }
 });
 
+btnSize.addEventListener('click', () => {
+  if (roomId) return;
+  presetIdx = (presetIdx + 1) % PRESETS.length;
+  state = stateFromPreset(presetState());
+  resetPlacement();
+  syncSizeLabel();
+  updateStatus();
+  drawAll();
+});
+
 function onThemeChange() { drawAll(); }
 window.addEventListener('resize', resize);
+syncSizeLabel();
 resize();
 initMultiplayer();
