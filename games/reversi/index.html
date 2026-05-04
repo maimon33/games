@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Reversi — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13; --surface:#1a1a24; --border:#2a2a38; --accent:#22c55e; --text:#e8e8f0; --muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8; --surface:#fff; --border:#dddde8; --accent:#15803d; --text:#1a1a2e; --muted:#6a6a86; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100dvh; padding:1rem; gap:.9rem; transition:background .2s,color .2s; }
+    nav { align-self:flex-start; display:flex; gap:1rem; align-items:center; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.2rem; font-weight:700; }
+    .scores { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+    .score { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.7rem 1rem; min-width:6rem; text-align:center; }
+    .score strong { display:block; font-size:1.45rem; color:var(--accent); }
+    .score span { color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; }
+    .board { display:grid; grid-template-columns:repeat(8, 1fr); gap:4px; width:min(94vw, 460px); background:#0f5132; padding:6px; border-radius:12px; border:1px solid #166534; }
+    .cell { aspect-ratio:1; border:none; border-radius:8px; background:#1f8a4c; cursor:pointer; position:relative; }
+    .cell:hover { filter:brightness(1.07); }
+    .cell.valid::after { content:''; position:absolute; inset:36%; border-radius:50%; background:rgba(255,255,255,.22); }
+    .disc { position:absolute; inset:10%; border-radius:50%; box-shadow:inset 0 3px 8px rgba(255,255,255,.22), inset 0 -8px 12px rgba(0,0,0,.3); }
+    .disc.black { background:radial-gradient(circle at 35% 30%, #5b6472, #111827 62%, #020617); }
+    .disc.white { background:radial-gradient(circle at 35% 30%, #fff, #e5e7eb 62%, #cbd5e1); }
+    .controls { display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; }
+    button { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.52rem 1.1rem; font-size:.9rem; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:hover { border-color:var(--accent); }
+    .theme-btn, .lang-btn { color:var(--muted); padding:.35rem .9rem; font-size:.8rem; }
+    #status { color:var(--muted); min-height:1.2em; text-align:center; font-size:.92rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <h1 data-i18n="game.reversi">Reversi</h1>
+  <div class="scores">
+    <div class="score"><strong id="black-score">2</strong><span>Black</span></div>
+    <div class="score"><strong id="white-score">2</strong><span>White</span></div>
+  </div>
+  <div id="board" class="board"></div>
+  <div id="status"></div>
+  <div class="controls">
+    <button id="btn-new" data-i18n="btn.new_game">New Game</button>
+    <button id="btn-mode">VS AI: On</button>
+  </div>
+  <script src="../../rating.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

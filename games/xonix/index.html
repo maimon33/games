@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Xonix — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13; --surface:#1a1a24; --border:#2a2a38; --accent:#0ea5e9; --text:#e8e8f0; --muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8; --surface:#fff; --border:#dddde8; --accent:#0284c7; --text:#1a1a2e; --muted:#6a6a86; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100dvh; padding:1rem; gap:.9rem; touch-action:none; transition:background .2s,color .2s; }
+    nav { align-self:flex-start; display:flex; gap:1rem; align-items:center; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.25rem; font-weight:700; }
+    .stats { display:flex; gap:1.2rem; flex-wrap:wrap; justify-content:center; }
+    .stat { display:flex; flex-direction:column; align-items:center; gap:.15rem; min-width:5.5rem; }
+    .stat strong { color:var(--accent); font-size:1.35rem; line-height:1; }
+    .stat span { color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
+    #canvas { display:block; border-radius:10px; max-width:100%; touch-action:none; }
+    .controls { display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; }
+    button { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.52rem 1.1rem; font-size:.9rem; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:hover { border-color:var(--accent); }
+    .theme-btn, .lang-btn { color:var(--muted); padding:.35rem .9rem; font-size:.8rem; }
+    #status { color:var(--muted); min-height:1.2em; text-align:center; font-size:.9rem; }
+    .hint { color:var(--muted); font-size:.76rem; text-align:center; max-width:32rem; line-height:1.55; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <h1 data-i18n="game.xonix">Xonix</h1>
+  <div class="stats">
+    <div class="stat"><strong id="score">0%</strong><span>Captured</span></div>
+    <div class="stat"><strong id="lives">3</strong><span>Lives</span></div>
+    <div class="stat"><strong id="level">1</strong><span>Level</span></div>
+  </div>
+  <canvas id="canvas" width="520" height="360"></canvas>
+  <div id="status"></div>
+  <div class="controls">
+    <button id="btn-new" data-i18n="btn.new_game">New Game</button>
+  </div>
+  <p class="hint">Close off water to claim territory. Leave the border, draw a trail through the field, and reconnect to land before the enemies hit your line.</p>
+  <script src="../../rating.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
