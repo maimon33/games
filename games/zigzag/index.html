@@ -35,6 +35,18 @@
     #canvas { border-radius:12px; max-width:100%; touch-action:none; cursor:pointer; display:block; }
     .score-row { font-size:0.9rem; color:var(--muted); }
     .score-row strong { color:var(--text); font-size:1.4rem; font-weight:800; }
+    canvas { max-width: 100%; height: auto; }
+
+    @media (max-width: 720px) {
+      body { padding: 0.85rem; gap: 0.7rem; }
+      nav { gap: 0.55rem; }
+      nav a, button, select, input { font-size: 0.85rem; }
+      h1 { text-align: center; }
+      .controls, .scores, .stats, .players, .setup, .room-row { justify-content: center; gap: 0.6rem; flex-wrap: wrap; text-align: center; }
+      .panel { width: min(100%, 560px); padding: 0.9rem; }
+      #board { width: min(100%, 520px); }
+    }
+
   </style>
 </head>
 <body>

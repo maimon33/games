@@ -304,6 +304,7 @@
     @media (max-width: 720px) {
       .hero {
         padding-inline: 1rem;
+        padding-bottom: 1rem;
       }
       .hero::before {
         inset: 0.5rem 0.6rem auto;
@@ -321,10 +322,20 @@
         display: flex;
         justify-content: center;
         margin-inline: auto;
+        width: min(100%, 26rem);
+        flex-wrap: wrap;
+        row-gap: 0.18rem;
+        padding-inline: 0.85rem;
       }
       .filters,
       .grid {
         padding-inline: 1rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 1.2rem 1.05rem 1.05rem;
       }
     }
   </style>

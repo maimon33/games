@@ -43,6 +43,18 @@
     .modal-close:hover{color:var(--text);}
     .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
     .modal-steps{padding-inline-start:1.2rem;display:flex;flex-direction:column;gap:.65rem;font-size:.88rem;line-height:1.5;}
+    canvas { max-width: 100%; height: auto; }
+
+    @media (max-width: 720px) {
+      body { padding: 0.85rem; gap: 0.7rem; }
+      nav { gap: 0.55rem; }
+      nav a, button, select, input { font-size: 0.85rem; }
+      h1 { text-align: center; }
+      .controls, .scores, .stats, .players, .setup, .room-row { justify-content: center; gap: 0.6rem; flex-wrap: wrap; text-align: center; }
+      .panel { width: min(100%, 560px); padding: 0.9rem; }
+      #board { width: min(100%, 520px); }
+    }
+
   </style>
 </head>
 <body>
