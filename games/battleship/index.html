@@ -177,12 +177,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Battleship</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.battleship">Battleship</span></div>
       <ol class="modal-steps">
-        <li><strong>Placement:</strong> Select a ship, click your grid to place it. Use Rotate to change orientation. Place all 5 ships then click Ready.</li>
-        <li><strong>Battle:</strong> Click the enemy grid to fire a shot. 🔴 = hit, ✕ = miss.</li>
-        <li>Sink all 5 enemy ships to win!</li>
-        <li>Press <strong>Invite Friend</strong> to play online. Host places ships first.</li>
+        <li data-i18n-html="help.battleship.1">Place your ships on your board, then press ready to begin the battle.</li>
+        <li data-i18n-html="help.battleship.2">On your turn, click the enemy grid to fire a shot and look for <strong>hits</strong> and <strong>sinks</strong>.</li>
+        <li data-i18n-html="help.battleship.3">Sink the entire enemy fleet before they sink yours.</li>
       </ol>
     </div>
   </div>

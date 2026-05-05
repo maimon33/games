@@ -64,13 +64,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Mastermind</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.mastermind">Mastermind</span></div>
       <ol class="modal-steps">
-        <li>Crack the secret 4-color code. You have <strong>10 attempts</strong>.</li>
-        <li>Click a <strong>color swatch</strong> at the bottom to select it, then click the 4 holes to fill your guess.</li>
-        <li>Press <strong>Submit</strong> (or the row arrow) when all 4 holes are filled.</li>
-        <li><strong>Black peg</strong> = right color, right position. <strong>White peg</strong> = right color, wrong position.</li>
-        <li>Use the clues to narrow down the secret code!</li>
+        <li data-i18n-html="help.mastermind.1">Pick four colors for each guess, then submit it to test the secret code.</li>
+        <li data-i18n-html="help.mastermind.2"><strong>Black pegs</strong> mean right color, right place. <strong>White pegs</strong> mean right color, wrong place.</li>
+        <li data-i18n-html="help.mastermind.3">Use the clues to crack the code within the allowed guesses.</li>
       </ol>
     </div>
   </div>

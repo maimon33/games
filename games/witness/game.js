@@ -32,12 +32,45 @@ const LEVELS = [
   { N:5, start:{r:0,c:0}, exit:{r:4,c:4},
     walls:[[[0,2],[1,2]],[[1,1],[1,2]],[[2,1],[3,1]],[[3,2],[3,3]],[[2,3],[2,4]]],
     symbols:[{r:0,c:0,color:'black'},{r:1,c:3,color:'white'},{r:3,c:1,color:'black'},{r:3,c:3,color:'white'}] },
+  // 9: 4×4, mirrored maze
+  { N:4, start:{r:3,c:0}, exit:{r:0,c:3},
+    walls:[[[0,1],[1,1]],[[1,1],[1,2]],[[2,0],[2,1]],[[2,2],[3,2]]],
+    symbols:[] },
+  // 10: 4×4, open separation
+  { N:4, start:{r:0,c:3}, exit:{r:3,c:0},
+    walls:[],
+    symbols:[{r:0,c:0,color:'black'},{r:0,c:1,color:'black'},{r:2,c:1,color:'white'},{r:2,c:2,color:'white'}] },
+  // 11: 5×5, vertical gates
+  { N:5, start:{r:4,c:0}, exit:{r:0,c:4},
+    walls:[[[0,1],[1,1]],[[1,3],[2,3]],[[2,1],[3,1]],[[3,2],[3,3]],[[1,0],[1,1]]],
+    symbols:[] },
+  // 12: 5×5, quadrant separation
+  { N:5, start:{r:0,c:4}, exit:{r:4,c:0},
+    walls:[],
+    symbols:[{r:0,c:0,color:'black'},{r:1,c:1,color:'black'},{r:2,c:2,color:'white'},{r:3,c:3,color:'white'}] },
+  // 13: 5×5, walls and split colors
+  { N:5, start:{r:2,c:0}, exit:{r:2,c:4},
+    walls:[[[0,2],[1,2]],[[1,1],[1,2]],[[2,2],[3,2]],[[3,2],[3,3]],[[1,3],[2,3]]],
+    symbols:[{r:0,c:0,color:'black'},{r:1,c:0,color:'black'},{r:2,c:3,color:'white'},{r:3,c:3,color:'white'}] },
+  // 14: 6×6, long route
+  { N:6, start:{r:0,c:0}, exit:{r:5,c:5},
+    walls:[[[0,2],[1,2]],[[1,2],[1,3]],[[2,1],[2,2]],[[2,4],[3,4]],[[3,2],[4,2]],[[4,3],[4,4]]],
+    symbols:[] },
+  // 15: 6×6, broad color split
+  { N:6, start:{r:5,c:0}, exit:{r:0,c:5},
+    walls:[],
+    symbols:[{r:0,c:0,color:'black'},{r:1,c:1,color:'black'},{r:3,c:3,color:'white'},{r:4,c:4,color:'white'}] },
+  // 16: 6×6, final mixed panel
+  { N:6, start:{r:0,c:5}, exit:{r:5,c:0},
+    walls:[[[0,3],[1,3]],[[1,1],[1,2]],[[2,4],[3,4]],[[3,2],[3,3]],[[4,1],[5,1]],[[4,3],[4,4]]],
+    symbols:[{r:0,c:1,color:'black'},{r:1,c:3,color:'black'},{r:3,c:1,color:'white'},{r:4,c:3,color:'white'}] },
 ];
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 const levelNumEl = document.getElementById('level-num');
+const levelTotalEl = document.getElementById('level-total');
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
@@ -183,6 +216,7 @@ function initLevel(idx) {
   statusEl.textContent = '';
   statusEl.className = '';
   levelNumEl.textContent = idx + 1;
+  levelTotalEl.textContent = LEVELS.length;
   draw();
 }
 

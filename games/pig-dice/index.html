@@ -85,12 +85,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Pig Dice</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.pig-dice">Pig Dice</span></div>
       <ol class="modal-steps">
-        <li>On your turn, press <strong>Roll</strong> to add the die to your turn bank.</li>
-        <li>If you roll a <strong>1</strong>, you lose the whole turn bank and the next player goes.</li>
-        <li>Press <strong>Hold</strong> to save the turn bank into your total score.</li>
-        <li>The first player to reach the target score wins.</li>
+        <li data-i18n-html="help.pig-dice.1">On your turn, press <strong>Roll</strong> to add the die result to your turn bank.</li>
+        <li data-i18n-html="help.pig-dice.2">If you roll a <strong>1</strong>, you lose the turn bank and the next player goes.</li>
+        <li data-i18n-html="help.pig-dice.3">Press <strong>Hold</strong> to save the turn bank into your total score and race to the target.</li>
       </ol>
     </div>
   </div>

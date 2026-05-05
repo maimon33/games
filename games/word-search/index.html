@@ -68,12 +68,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Word Search</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.word-search">Word Search</span></div>
       <ol class="modal-steps">
-        <li>Find all the words hidden in the grid. Words can go in any of <strong>8 directions</strong>.</li>
-        <li><strong>Click and drag</strong> (or swipe on mobile) across the letters to select a word.</li>
-        <li>Found words are highlighted and crossed off the list.</li>
-        <li>Find all words to win! Each puzzle has a new theme.</li>
+        <li data-i18n-html="help.word-search.1">Find every hidden word in the letter grid.</li>
+        <li data-i18n-html="help.word-search.2">Words can appear in straight lines in any of the <strong>8 directions</strong>.</li>
+        <li data-i18n-html="help.word-search.3">Drag from the first letter to the last to mark a word and clear the list.</li>
       </ol>
     </div>
   </div>

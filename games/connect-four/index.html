@@ -69,13 +69,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Connect Four</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.connect-four">Connect Four</span></div>
       <ol class="modal-steps">
-        <li>Players alternate dropping pieces into any column.</li>
-        <li>Pieces fall to the lowest empty row in that column.</li>
-        <li>First to connect <strong>4 in a row</strong> (horizontal, vertical, or diagonal) wins!</li>
-        <li>If the board fills up with no winner, it's a draw.</li>
-        <li>Press <strong>Invite Friend</strong> to play online. Red (host) always goes first.</li>
+        <li data-i18n-html="help.connect-four.1">Players take turns dropping discs into any column.</li>
+        <li data-i18n-html="help.connect-four.2">Each disc falls to the lowest open space in that column.</li>
+        <li data-i18n-html="help.connect-four.3">Make <strong>4 in a row</strong> horizontally, vertically, or diagonally to win.</li>
       </ol>
     </div>
   </div>

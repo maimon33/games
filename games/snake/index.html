@@ -70,12 +70,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Snake</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.snake">Snake</span></div>
       <ol class="modal-steps">
-        <li>Use <strong>arrow keys</strong> or swipe to steer the snake.</li>
-        <li>Eat the red food pellet to grow longer and score a point.</li>
-        <li>Avoid hitting the walls or your own tail!</li>
-        <li>The snake speeds up as your score increases.</li>
+        <li data-i18n-html="help.snake.1">Use <strong>arrow keys</strong> or swipe to steer the snake around the board.</li>
+        <li data-i18n-html="help.snake.2">Eat the food to grow longer and increase your score.</li>
+        <li data-i18n-html="help.snake.3">Avoid crashing into the walls or your own tail.</li>
       </ol>
     </div>
   </div>

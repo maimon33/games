@@ -79,14 +79,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Backgammon</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.backgammon">Backgammon</span></div>
       <ol class="modal-steps">
-        <li>White moves from point 24→1 (right to left on top, left to right on bottom). Black moves 1→24.</li>
-        <li>Click <strong>Roll Dice</strong> on your turn. Then click a piece to select it, and click a valid destination.</li>
-        <li>Landing on a single opponent piece <strong>hits</strong> it — it goes to the bar and must re-enter before other moves.</li>
-        <li>When all your pieces are in your home board (points 1–6 for White, 19–24 for Black), you can start <strong>bearing off</strong>.</li>
-        <li>First to bear off all 15 pieces wins!</li>
-        <li>Press <strong>Invite Friend</strong> to play online. White (host) goes first.</li>
+        <li data-i18n-html="help.backgammon.1">Roll the dice, then move your checkers by clicking a piece and a valid destination.</li>
+        <li data-i18n-html="help.backgammon.2">Single enemy checkers can be <strong>hit</strong> and sent to the bar before they re-enter.</li>
+        <li data-i18n-html="help.backgammon.3">Bring all 15 checkers home and <strong>bear them off</strong> before your opponent to win.</li>
       </ol>
     </div>
   </div>

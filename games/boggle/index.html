@@ -83,13 +83,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Boggle</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.boggle">Boggle</span></div>
       <ol class="modal-steps">
-        <li>Find as many words as possible in <strong>3 minutes</strong>.</li>
-        <li><strong>Click and drag</strong> (or tap each letter) to trace a path through adjacent letters.</li>
-        <li>Letters must be <strong>adjacent</strong> (including diagonals) and each cell can only be used <strong>once per word</strong>.</li>
-        <li>Words must be at least <strong>3 letters</strong> long.</li>
-        <li>Scoring: 3–4 letters = 1 pt · 5 = 2 · 6 = 3 · 7 = 5 · 8+ = 11</li>
+        <li data-i18n-html="help.boggle.1">Find as many words as possible before the <strong>3-minute timer</strong> runs out.</li>
+        <li data-i18n-html="help.boggle.2">Drag or tap through <strong>adjacent letters</strong>, including diagonals, to build a word.</li>
+        <li data-i18n-html="help.boggle.3">Each cell can be used only once per word, and words must be at least <strong>3 letters</strong> long.</li>
       </ol>
     </div>
   </div>

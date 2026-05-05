@@ -69,12 +69,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Chess</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.chess">Chess</span></div>
       <ol class="modal-steps">
-        <li>Click a piece to select it, then click a highlighted square to move.</li>
-        <li>Capture the opponent's king — checkmate wins the game.</li>
-        <li>Press <strong>Invite Friend</strong> to create a multiplayer room. Share the link, code, or QR with your opponent.</li>
-        <li>The board flips automatically so your pieces are always at the bottom.</li>
+        <li data-i18n-html="help.chess.1">Click a piece to select it, then click a highlighted square to move.</li>
+        <li data-i18n-html="help.chess.2">Each piece moves in its own pattern. Protect your king while attacking the opponent's.</li>
+        <li data-i18n-html="help.chess.3">Win by putting the enemy king in <strong>checkmate</strong>. Use <strong>Invite Friend</strong> for online play.</li>
       </ol>
     </div>
   </div>

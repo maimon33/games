@@ -79,12 +79,11 @@
   <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
     <div class="modal-box">
       <button class="modal-close" onclick="closeHelp()">×</button>
-      <div class="modal-title">How to Play — Dots &amp; Boxes</div>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.dots-boxes">Dots &amp; Boxes</span></div>
       <ol class="modal-steps">
-        <li>Players take turns drawing a line between two adjacent dots.</li>
-        <li>Complete the <strong>4th side</strong> of a box to claim it — and <strong>go again</strong>!</li>
-        <li>The player with the most boxes when the grid is full <strong>wins</strong>.</li>
-        <li>Press <strong>Invite Friend</strong> to play online. Red goes first.</li>
+        <li data-i18n-html="help.dots-boxes.1">Players take turns drawing one line between two neighboring dots.</li>
+        <li data-i18n-html="help.dots-boxes.2">Complete the fourth side of a box to <strong>claim it</strong> and immediately take another turn.</li>
+        <li data-i18n-html="help.dots-boxes.3">The player with the most completed boxes at the end wins.</li>
       </ol>
     </div>
   </div>
