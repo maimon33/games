@@ -112,8 +112,11 @@
       line-height: 1.65;
     }
     .hero-meta {
-      display: inline-flex;
+      display: flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: fit-content;
       gap: 0.5rem;
       margin-top: 1.4rem;
       margin-inline: auto;
@@ -126,7 +129,7 @@
       font-family: "IBM Plex Mono", monospace;
       letter-spacing: 0.03em;
     }
-    .hero-meta span { color: var(--accent-soft); font-weight: 600; }
+    .hero-meta span { color: var(--accent-soft); font-weight: 600; display: inline-flex; justify-content: center; }
 
     /* ── Filter pills ── */
     .filters {
