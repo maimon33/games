@@ -21,8 +21,8 @@ faceImages.H.onload = faceImages.T.onload = () => {
   imagesLoaded++;
   drawCoin(1, side);
 };
-faceImages.H.src = 'heads.svg';
-faceImages.T.src = 'tails.svg';
+faceImages.H.src = 'heads.png';
+faceImages.T.src = 'tails.png';
 
 const COIN = {
   silverHi: '#f6f8fc',
