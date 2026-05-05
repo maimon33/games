@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pig Dice — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13; --surface:#1a1a24; --border:#2a2a38; --accent:#d97706; --text:#e8e8f0; --muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8; --surface:#fff; --border:#dddde8; --accent:#b45309; --text:#1a1a2e; --muted:#6a6a86; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100dvh; padding:1rem; gap:.9rem; transition:background .2s,color .2s; }
+    nav { align-self:center; display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.2rem; font-weight:700; }
+    .panel { width:min(94vw, 560px); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:1rem; }
+    .setup, .controls, .players { display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; }
+    .player { border:1px solid var(--border); border-radius:12px; padding:.8rem .9rem; min-width:110px; text-align:center; }
+    .player.active { border-color:var(--accent); }
+    .player strong { display:block; color:var(--accent); font-size:1.35rem; }
+    .player small { color:var(--muted); display:block; margin-top:.15rem; }
+    .die { width:92px; height:92px; border-radius:18px; background:linear-gradient(180deg, #fff, #e5e7eb); margin:0 auto; position:relative; box-shadow:0 10px 20px rgba(0,0,0,.18); }
+    .pip { width:14px; height:14px; border-radius:50%; background:#111827; position:absolute; }
+    button, select, input { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.52rem .95rem; font-size:.9rem; }
+    button { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:hover, select:hover, input:hover { border-color:var(--accent); }
+    .theme-btn, .lang-btn { color:var(--muted); padding:.35rem .9rem; font-size:.8rem; }
+    #status { text-align:center; color:var(--muted); min-height:1.2em; font-size:.92rem; }
+    .turn-box { text-align:center; }
+    .turn-box strong { color:var(--accent); font-size:2rem; display:block; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <h1 data-i18n="game.pig-dice">Pig Dice</h1>
+  <div class="panel">
+    <div class="setup">
+      <select id="player-count">
+        <option value="2">2 Players</option>
+        <option value="3">3 Players</option>
+        <option value="4" selected>4 Players</option>
+        <option value="5">5 Players</option>
+        <option value="6">6 Players</option>
+      </select>
+      <input id="target-score" type="number" min="30" max="200" value="100">
+      <button id="btn-new" data-i18n="btn.new_game">New Game</button>
+    </div>
+    <div class="players" id="players"></div>
+    <div class="die" id="die"></div>
+    <div class="turn-box">
+      <div>Turn Bank</div>
+      <strong id="turn-score">0</strong>
+    </div>
+    <div id="status"></div>
+    <div class="controls">
+      <button id="btn-roll">Roll</button>
+      <button id="btn-hold">Hold</button>
+    </div>
+  </div>
+  <script src="../../rating.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

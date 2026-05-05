@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Snakes and Ladders — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f0f13; --surface:#1a1a24; --border:#2a2a38; --accent:#16a34a; --text:#e8e8f0; --muted:#7a7a96; }
+    [data-theme="light"] { --bg:#f4f4f8; --surface:#fff; --border:#dddde8; --accent:#15803d; --text:#1a1a2e; --muted:#6a6a86; }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100dvh; padding:1rem; gap:.9rem; transition:background .2s,color .2s; }
+    nav { align-self:center; display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.2rem; font-weight:700; }
+    #board { width:min(94vw, 540px); aspect-ratio:1; display:grid; grid-template-columns:repeat(10,1fr); gap:3px; background:var(--border); padding:4px; border-radius:12px; }
+    .cell { position:relative; background:linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, #fff), color-mix(in srgb, var(--surface) 84%, var(--bg))); min-height:44px; padding:4px; border-radius:6px; overflow:hidden; }
+    .cell:nth-child(odd) { background:linear-gradient(180deg, color-mix(in srgb, #d9f99d 34%, var(--surface)), color-mix(in srgb, #86efac 16%, var(--surface))); }
+    .cell-num { font-size:.65rem; color:var(--muted); }
+    .cell-link { position:absolute; inset:auto 4px 4px auto; font-size:.68rem; font-weight:700; opacity:.9; }
+    .snake { color:#dc2626; }
+    .ladder { color:#2563eb; }
+    .tokens { display:flex; flex-wrap:wrap; gap:3px; position:absolute; left:4px; right:4px; bottom:4px; }
+    .token { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.7); box-shadow:0 1px 4px rgba(0,0,0,.28); }
+    .panel { width:min(94vw, 540px); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:.85rem; }
+    .controls, .players { display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; }
+    button, select { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:.52rem 1rem; font-size:.9rem; }
+    button { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    button:hover, select:hover { border-color:var(--accent); }
+    .theme-btn, .lang-btn { color:var(--muted); padding:.35rem .9rem; font-size:.8rem; }
+    .player-pill { display:flex; align-items:center; gap:.45rem; padding:.45rem .7rem; border:1px solid var(--border); border-radius:999px; }
+    .dot { width:12px; height:12px; border-radius:50%; }
+    #status { text-align:center; color:var(--muted); min-height:1.2em; font-size:.92rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+  <h1 data-i18n="game.snakes-ladders">Snakes and Ladders</h1>
+  <div id="board"></div>
+  <div class="panel">
+    <div class="players" id="players"></div>
+    <div id="status"></div>
+    <div class="controls">
+      <select id="player-count">
+        <option value="2">2 Players</option>
+        <option value="3">3 Players</option>
+        <option value="4" selected>4 Players</option>
+      </select>
+      <button id="btn-roll">Roll</button>
+      <button id="btn-new" data-i18n="btn.new_game">New Game</button>
+    </div>
+  </div>
+  <script src="../../rating.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
