@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="320 0 768 768" width="768" height="768">
+  <defs>
+    <clipPath id="coin-clip-tails">
+      <circle cx="704" cy="384" r="320"/>
+    </clipPath>
+    <filter id="drop-white-tails" color-interpolation-filters="sRGB">
+      <feColorMatrix
+        in="SourceGraphic"
+        type="matrix"
+        values="
+          1 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          -1 -1 -1 0 3"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#coin-clip-tails)" filter="url(#drop-white-tails)">
+    <image href="tails.png" x="0" y="0" width="1408" height="768" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+</svg>
