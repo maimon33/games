@@ -28,8 +28,9 @@ const COIN = {
   silverHi: '#f6f8fc',
   silverMid: '#c7cfdb',
   silverLo: '#6e7787',
-  rimHi: '#eef2f8',
-  rimLo: '#727b8b',
+  rimHi: '#f2f5fb',
+  rimMid: '#aeb7c6',
+  rimLo: '#5e6776',
   stroke: '#4b5565',
   shadow: 'rgba(3, 7, 18, 0.28)',
 };
@@ -57,16 +58,18 @@ function drawCoinBase(scaleX) {
 
   ctx.scale(Math.abs(scaleX), 1);
 
-  for (let i = 0; i < 96; i++) {
-    const a1 = (i / 96) * Math.PI * 2;
-    const a2 = ((i + 0.72) / 96) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, R, a1, a2);
-    ctx.arc(0, 0, faceR, a2, a1, true);
-    ctx.closePath();
-    ctx.fillStyle = i % 2 === 0 ? COIN.rimHi : COIN.rimLo;
-    ctx.fill();
-  }
+  const rim = ctx.createLinearGradient(-R, -R, R, R);
+  rim.addColorStop(0, COIN.rimLo);
+  rim.addColorStop(0.24, COIN.rimHi);
+  rim.addColorStop(0.56, COIN.rimMid);
+  rim.addColorStop(0.82, COIN.rimHi);
+  rim.addColorStop(1, COIN.rimLo);
+  ctx.fillStyle = rim;
+  ctx.beginPath();
+  ctx.arc(0, 0, R, 0, Math.PI * 2);
+  ctx.arc(0, 0, faceR, 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.fill();
 
   const face = ctx.createRadialGradient(-faceR * 0.34, -faceR * 0.42, faceR * 0.04, 0, 0, faceR * 1.04);
   face.addColorStop(0, COIN.silverHi);
@@ -104,12 +107,15 @@ function drawCoinBase(scaleX) {
 function drawFaceImage(faceR, currentSide) {
   const img = faceImages[currentSide];
   if (!img || !img.complete || !img.naturalWidth) return;
+  const srcSize = Math.min(img.naturalWidth, img.naturalHeight);
+  const sx = (img.naturalWidth - srcSize) / 2;
+  const sy = (img.naturalHeight - srcSize) / 2;
 
   ctx.save();
   ctx.beginPath();
   ctx.arc(0, 0, faceR * 0.98, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(img, -faceR, -faceR, faceR * 2, faceR * 2);
+  ctx.drawImage(img, sx, sy, srcSize, srcSize, -faceR, -faceR, faceR * 2, faceR * 2);
 
   const sheen = ctx.createRadialGradient(-faceR * 0.18, -faceR * 0.58, 0, -faceR * 0.18, -faceR * 0.58, faceR * 0.95);
   sheen.addColorStop(0, 'rgba(255,255,255,0.22)');
