@@ -4,6 +4,7 @@ const scoreEl = document.getElementById('score');
 const livesEl = document.getElementById('lives');
 const levelEl = document.getElementById('level');
 const statusEl = document.getElementById('status');
+const speedSelect = document.getElementById('speed-select');
 
 const COLS = 13;
 const ROWS = 14;
@@ -22,10 +23,14 @@ let animId = 0;
 let running = false;
 let touchStart = null;
 
+function speedFactor() {
+  return Number(speedSelect.value || 1);
+}
+
 function resize() {
-  const width = Math.min(window.innerWidth - 32, 560);
+  const width = Math.min(window.innerWidth - 32, 700);
   canvas.width = width;
-  canvas.height = Math.round(width * 1.08);
+  canvas.height = Math.round(width * 0.94);
   cell = canvas.width / COLS;
   draw();
 }
@@ -46,7 +51,7 @@ function makeLane(row, speed, widths, gap, color) {
 }
 
 function buildWorld() {
-  const scale = 1 + (level - 1) * 0.14;
+  const scale = speedFactor() * (1 + (level - 1) * 0.14);
   roads = [
     ...makeLane(11, -110 * scale, [1.4, 1.8], 1.4, '#f97316'),
     ...makeLane(10, 150 * scale, [1.2, 1.6], 1.1, '#38bdf8'),
@@ -271,6 +276,14 @@ canvas.addEventListener('touchend', e => {
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('btn-new').addEventListener('click', newGame);
+speedSelect.addEventListener('change', () => {
+  const currentLevel = level;
+  buildWorld();
+  level = currentLevel;
+  updateUI();
+  statusEl.textContent = `Speed: ${speedSelect.options[speedSelect.selectedIndex].text}`;
+  draw();
+});
 window.addEventListener('resize', resize);
 function onThemeChange() { draw(); }
 

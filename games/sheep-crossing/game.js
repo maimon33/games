@@ -4,6 +4,7 @@ const scoreEl = document.getElementById('score');
 const livesEl = document.getElementById('lives');
 const levelEl = document.getElementById('level');
 const statusEl = document.getElementById('status');
+const speedSelect = document.getElementById('speed-select');
 
 const COLS = 9;
 const ROWS = 12;
@@ -19,10 +20,14 @@ let animId = 0;
 let lastTime = 0;
 let touchStart = null;
 
+function speedFactor() {
+  return Number(speedSelect.value || 1);
+}
+
 function resize() {
-  const width = Math.min(window.innerWidth - 32, 520);
+  const width = Math.min(window.innerWidth - 32, 680);
   canvas.width = width;
-  canvas.height = Math.round(width * 1.22);
+  canvas.height = Math.round(width * 1.04);
   cell = canvas.width / COLS;
   draw();
 }
@@ -39,7 +44,7 @@ function makeLane(row, speed, palette) {
 }
 
 function buildLanes() {
-  const scale = 1 + (level - 1) * 0.12;
+  const scale = speedFactor() * (1 + (level - 1) * 0.12);
   lanes = [
     ...makeLane(9, -130 * scale, ['#f97316', '#ef4444']),
     ...makeLane(8, 105 * scale, ['#facc15', '#38bdf8']),
@@ -239,6 +244,14 @@ canvas.addEventListener('touchend', e => {
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('btn-new').addEventListener('click', newGame);
+speedSelect.addEventListener('change', () => {
+  const currentLevel = level;
+  buildLanes();
+  level = currentLevel;
+  updateUI();
+  statusEl.textContent = `Speed: ${speedSelect.options[speedSelect.selectedIndex].text}`;
+  draw();
+});
 window.addEventListener('resize', resize);
 function onThemeChange() { draw(); }
 

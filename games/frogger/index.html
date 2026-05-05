@@ -58,9 +58,14 @@
     <div class="stat"><strong id="lives">3</strong><span>Lives</span></div>
     <div class="stat"><strong id="level">1</strong><span data-i18n="label.level">Level</span></div>
   </div>
-  <canvas id="canvas" width="520" height="560"></canvas>
+  <canvas id="canvas" width="640" height="600"></canvas>
   <div id="status"></div>
   <div class="controls">
+    <select id="speed-select" aria-label="Speed">
+      <option value="0.72" data-i18n="speed.slow">Slow</option>
+      <option value="1" data-i18n="speed.normal" selected>Normal</option>
+      <option value="1.2" data-i18n="speed.fast">Fast</option>
+    </select>
     <button id="btn-new" data-i18n="btn.new_game">New Game</button>
   </div>
   <p class="hint" data-i18n="hint.frogger">Cross the road, ride the logs, and hop into all the homes.</p>
