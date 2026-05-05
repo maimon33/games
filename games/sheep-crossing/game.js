@@ -4,7 +4,7 @@ const scoreEl = document.getElementById('score');
 const livesEl = document.getElementById('lives');
 const levelEl = document.getElementById('level');
 const statusEl = document.getElementById('status');
-const speedSelect = document.getElementById('speed-select');
+const difficultySelect = document.getElementById('difficulty-select');
 
 const COLS = 9;
 const ROWS = 12;
@@ -20,8 +20,11 @@ let animId = 0;
 let lastTime = 0;
 let touchStart = null;
 
-function speedFactor() {
-  return Number(speedSelect.value || 1);
+function difficultyConfig() {
+  const mode = difficultySelect.value || 'normal';
+  if (mode === 'easy') return { speed: 0.72, gap: 1.6 };
+  if (mode === 'hard') return { speed: 1.18, gap: 0.82 };
+  return { speed: 1, gap: 1 };
 }
 
 function resize() {
@@ -35,16 +38,18 @@ function resize() {
 function makeLane(row, speed, palette) {
   const vehicles = [];
   let x = row % 2 === 0 ? -cell : 0;
+  const spacingScale = difficultyConfig().gap;
   while (x < canvas.width + cell * 2) {
     const w = (1.2 + Math.random() * 0.9) * cell;
     vehicles.push({ x, row, w, speed, color: palette[Math.floor(Math.random() * palette.length)] });
-    x += w + cell * (0.85 + Math.random() * 0.8);
+    x += w + cell * (0.85 + Math.random() * 0.8) * spacingScale;
   }
   return vehicles;
 }
 
 function buildLanes() {
-  const scale = speedFactor() * (1 + (level - 1) * 0.12);
+  const config = difficultyConfig();
+  const scale = config.speed * (1 + (level - 1) * 0.12);
   lanes = [
     ...makeLane(9, -130 * scale, ['#f97316', '#ef4444']),
     ...makeLane(8, 105 * scale, ['#facc15', '#38bdf8']),
@@ -244,13 +249,9 @@ canvas.addEventListener('touchend', e => {
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('btn-new').addEventListener('click', newGame);
-speedSelect.addEventListener('change', () => {
-  const currentLevel = level;
-  buildLanes();
-  level = currentLevel;
-  updateUI();
-  statusEl.textContent = `Speed: ${speedSelect.options[speedSelect.selectedIndex].text}`;
-  draw();
+difficultySelect.addEventListener('change', () => {
+  newGame();
+  statusEl.textContent = `${difficultySelect.options[difficultySelect.selectedIndex].text} mode`;
 });
 window.addEventListener('resize', resize);
 function onThemeChange() { draw(); }
