@@ -15,10 +15,14 @@ const faceImages = {
   H: new Image(),
   T: new Image(),
 };
-let imagesLoaded = 0;
+const faceImageBounds = {
+  H: null,
+  T: null,
+};
 
 faceImages.H.onload = faceImages.T.onload = () => {
-  imagesLoaded++;
+  faceImageBounds.H = computeImageBounds(faceImages.H);
+  faceImageBounds.T = computeImageBounds(faceImages.T);
   drawCoin(1, side);
 };
 faceImages.H.src = 'heads.png';
@@ -34,6 +38,55 @@ const COIN = {
   stroke: '#4b5565',
   shadow: 'rgba(3, 7, 18, 0.28)',
 };
+
+function computeImageBounds(img) {
+  if (!img.complete || !img.naturalWidth || !img.naturalHeight) return null;
+
+  const probe = document.createElement('canvas');
+  probe.width = img.naturalWidth;
+  probe.height = img.naturalHeight;
+  const probeCtx = probe.getContext('2d', { willReadFrequently: true });
+  probeCtx.drawImage(img, 0, 0);
+
+  const { data, width, height } = probeCtx.getImageData(0, 0, probe.width, probe.height);
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const alpha = data[i + 3];
+      if (alpha < 10) continue;
+
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const isBackground = r > 245 && g > 245 && b > 245;
+      if (isBackground) continue;
+
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return { sx: 0, sy: 0, sw: width, sh: height };
+  }
+
+  const padX = Math.round((maxX - minX + 1) * 0.06);
+  const padY = Math.round((maxY - minY + 1) * 0.06);
+
+  return {
+    sx: Math.max(0, minX - padX),
+    sy: Math.max(0, minY - padY),
+    sw: Math.min(width, maxX + padX + 1) - Math.max(0, minX - padX),
+    sh: Math.min(height, maxY + padY + 1) - Math.max(0, minY - padY),
+  };
+}
 
 function drawCoinBase(scaleX) {
   const W = canvas.width;
@@ -107,15 +160,28 @@ function drawCoinBase(scaleX) {
 function drawFaceImage(faceR, currentSide) {
   const img = faceImages[currentSide];
   if (!img || !img.complete || !img.naturalWidth) return;
-  const srcSize = Math.min(img.naturalWidth, img.naturalHeight);
-  const sx = (img.naturalWidth - srcSize) / 2;
-  const sy = (img.naturalHeight - srcSize) / 2;
+  const bounds = faceImageBounds[currentSide] || {
+    sx: 0,
+    sy: 0,
+    sw: img.naturalWidth,
+    sh: img.naturalHeight,
+  };
+  const srcSize = Math.max(bounds.sw, bounds.sh);
+  const sx = bounds.sx - (srcSize - bounds.sw) / 2;
+  const sy = bounds.sy - (srcSize - bounds.sh) / 2;
+  const safeSx = Math.max(0, sx);
+  const safeSy = Math.max(0, sy);
+  const safeSize = Math.min(
+    srcSize,
+    img.naturalWidth - safeSx,
+    img.naturalHeight - safeSy
+  );
 
   ctx.save();
   ctx.beginPath();
   ctx.arc(0, 0, faceR * 0.98, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(img, sx, sy, srcSize, srcSize, -faceR, -faceR, faceR * 2, faceR * 2);
+  ctx.drawImage(img, safeSx, safeSy, safeSize, safeSize, -faceR, -faceR, faceR * 2, faceR * 2);
 
   const sheen = ctx.createRadialGradient(-faceR * 0.18, -faceR * 0.58, 0, -faceR * 0.18, -faceR * 0.58, faceR * 0.95);
   sheen.addColorStop(0, 'rgba(255,255,255,0.22)');
