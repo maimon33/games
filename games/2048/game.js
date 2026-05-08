@@ -14,7 +14,7 @@ function cv(name) {
 }
 
 function boardSize() {
-  return Math.min(window.innerWidth - 32, 400);
+  return Math.min(window.innerWidth - 32, 480);
 }
 
 function tileSize() {

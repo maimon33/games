@@ -59,7 +59,7 @@ function landRow(board, col) {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  CELL = Math.floor(Math.min(window.innerWidth - 32, 420) / COLS);
+  CELL = Math.floor(Math.min(window.innerWidth - 32, 560) / COLS);
   canvas.width = CELL * COLS; canvas.height = CELL * ROWS;
   draw();
 }

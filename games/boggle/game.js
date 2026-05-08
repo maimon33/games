@@ -101,7 +101,7 @@ function addChip(word, pts) {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const sz = Math.min(window.innerWidth - 32, 320);
+  const sz = Math.min(window.innerWidth - 32, 420);
   canvas.width = canvas.height = sz;
   CELL = sz / GRID_N;
   draw();

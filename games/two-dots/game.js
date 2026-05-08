@@ -7,10 +7,19 @@ const statusEl = document.getElementById('status');
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-const ROWS = 6, COLS = 6, CELL = 55, DOT_R = 18;
+const ROWS = 6, COLS = 6;
+let CELL = 55, DOT_R = 18;
 const COLORS = ['#e05252','#4fa8e0','#52e07c','#e0c452','#c452e0'];
 
 let grid, chain, dragging, score, fallAnim, animFrame;
+
+function resize() {
+  const size = Math.min(window.innerWidth - 32, 420);
+  canvas.width = canvas.height = size;
+  CELL = canvas.width / COLS;
+  DOT_R = CELL * 0.33;
+  draw();
+}
 
 function init() {
   grid = Array.from({length: ROWS}, () =>
@@ -21,6 +30,7 @@ function init() {
   score = 0;
   fallAnim = Array.from({length: ROWS}, () => Array(COLS).fill(0));
   updateScore();
+  resize();
   draw();
 }
 
@@ -324,4 +334,5 @@ canvas.addEventListener('touchend', onPointerUp, { passive: false });
 
 function onThemeChange() { draw(); }
 
+window.addEventListener('resize', resize);
 init();

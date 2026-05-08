@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Trivia — Maimon's Games</title>
+  <script src="../../i18n.js"></script>
+  <script src="../../theme.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0e1525;
+      --surface:#172033;
+      --surface-2:#101826;
+      --border:#2b3852;
+      --accent:#f59e0b;
+      --accent-2:#f97316;
+      --text:#edf2ff;
+      --muted:#9ca9c4;
+      --good:#22c55e;
+      --bad:#ef4444;
+    }
+    [data-theme="light"] {
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface-2:#f2f4fa;
+      --border:#d8dfef;
+      --accent:#d97706;
+      --accent-2:#ea580c;
+      --text:#162033;
+      --muted:#66728a;
+      --good:#15803d;
+      --bad:#dc2626;
+    }
+    body {
+      background:
+        radial-gradient(circle at top, rgba(245,158,11,.14), transparent 34%),
+        linear-gradient(180deg, var(--bg), #09101b 140%);
+      color:var(--text);
+      font-family:system-ui,-apple-system,sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      min-height:100dvh;
+      padding:1rem;
+      gap:1rem;
+      transition:background .2s,color .2s;
+    }
+    nav { align-self:center; display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.9rem; }
+    nav a:hover { color:var(--text); }
+    h1 { font-size:1.2rem; font-weight:700; text-align:center; }
+    .theme-btn, .lang-btn, button, select {
+      background:var(--surface);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:.55rem 1rem;
+      font-size:.9rem;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .theme-btn, .lang-btn { color:var(--muted); padding:.35rem .9rem; font-size:.8rem; }
+    button:hover, select:hover { border-color:var(--accent); }
+    .shell {
+      width:min(100%, 860px);
+      display:grid;
+      gap:1rem;
+    }
+    .panel {
+      background:rgba(23,32,51,.78);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:1.1rem;
+      box-shadow:0 18px 45px rgba(0,0,0,.22);
+      backdrop-filter:blur(10px);
+    }
+    [data-theme="light"] .panel { background:rgba(255,255,255,.92); }
+    .setup {
+      display:grid;
+      gap:.9rem;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      align-items:end;
+    }
+    .field { display:flex; flex-direction:column; gap:.35rem; }
+    .field label { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; }
+    .field select, .field button { width:100%; }
+    .board { display:grid; gap:1rem; }
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:.8rem;
+    }
+    .stat {
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:.85rem .9rem;
+      text-align:center;
+    }
+    .stat strong { display:block; font-size:1.45rem; color:var(--accent); line-height:1.05; }
+    .stat span { color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.06em; }
+    .question-card {
+      background:linear-gradient(180deg, rgba(245,158,11,.08), rgba(249,115,22,.04));
+      border:1px solid rgba(245,158,11,.2);
+      border-radius:22px;
+      padding:1.1rem;
+      display:grid;
+      gap:1rem;
+    }
+    .question-top {
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .eyebrow { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; }
+    #question {
+      font-size:clamp(1.15rem, 2.6vw, 1.55rem);
+      line-height:1.45;
+      font-weight:700;
+    }
+    #meta-line { color:var(--muted); font-size:.88rem; line-height:1.5; }
+    .answers {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:.8rem;
+    }
+    .answer-btn {
+      text-align:start;
+      white-space:normal;
+      min-height:4rem;
+      line-height:1.35;
+      padding:.95rem 1rem;
+      border-radius:16px;
+      font-weight:600;
+    }
+    .answer-btn.correct {
+      border-color:rgba(34,197,94,.45);
+      background:rgba(34,197,94,.16);
+      color:var(--text);
+    }
+    .answer-btn.wrong {
+      border-color:rgba(239,68,68,.45);
+      background:rgba(239,68,68,.12);
+      color:var(--text);
+    }
+    .footer-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:1rem;
+      flex-wrap:wrap;
+    }
+    #status {
+      min-height:1.4em;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.45;
+    }
+    #status.good { color:var(--good); font-weight:700; }
+    #status.bad { color:var(--bad); font-weight:700; }
+    .hint, .credit {
+      color:var(--muted);
+      font-size:.8rem;
+      line-height:1.55;
+      text-align:center;
+    }
+    .credit a { color:var(--accent); text-decoration:none; }
+    .credit a:hover { text-decoration:underline; }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;max-width:380px;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
+    .modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1;padding:0;}
+    .modal-close:hover{color:var(--text);}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:1rem;}
+    .modal-steps{padding-inline-start:1.2rem;display:flex;flex-direction:column;gap:.65rem;font-size:.88rem;line-height:1.5;}
+
+    @media (max-width: 720px) {
+      body { padding:.85rem; gap:.75rem; }
+      nav { gap:.55rem; }
+      nav a, button, select { font-size:.85rem; }
+      .panel { padding:.9rem; border-radius:18px; }
+      .setup, .stats, .answers { grid-template-columns:1fr; }
+      .question-top, .footer-row { justify-content:center; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../../" data-i18n="nav.back">← Back</a>
+    <button class="theme-btn" onclick="openHelp()">?</button>
+    <button class="lang-btn" onclick="toggleLang()">עב</button>
+    <button class="theme-btn" onclick="toggleTheme()">Light</button>
+  </nav>
+
+  <h1 data-i18n="game.trivia">Trivia</h1>
+
+  <div class="shell">
+    <div class="panel setup">
+      <div class="field">
+        <label for="difficulty-select" data-i18n="label.difficulty">Difficulty</label>
+        <select id="difficulty-select">
+          <option value="any" data-i18n="trivia.diff_any">Any</option>
+          <option value="easy" data-i18n="difficulty.easy">Easy</option>
+          <option value="medium" data-i18n="btn.diff_medium">Medium</option>
+          <option value="hard" data-i18n="difficulty.hard">Hard</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="language-select" data-i18n="label.language">Language</label>
+        <select id="language-select">
+          <option value="en" data-i18n="lang.english">English</option>
+          <option value="he" data-i18n="lang.hebrew">Hebrew</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="category-select" data-i18n="label.category">Category</label>
+        <select id="category-select">
+          <option value="any" data-i18n="trivia.category_any">Any Category</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="btn-new-set" data-i18n="label.questions">Questions</label>
+        <button id="btn-new-set" data-i18n="btn.new_set">New Set</button>
+      </div>
+    </div>
+
+    <div class="panel board">
+      <div class="stats">
+        <div class="stat"><strong id="score">0</strong><span data-i18n="label.score">Score</span></div>
+        <div class="stat"><strong id="question-number">0/0</strong><span data-i18n="label.question">Question</span></div>
+        <div class="stat"><strong id="difficulty-pill">—</strong><span data-i18n="label.difficulty">Difficulty</span></div>
+        <div class="stat"><strong id="source-pill">OTDB</strong><span data-i18n="label.source">Source</span></div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-top">
+          <div>
+            <div class="eyebrow" data-i18n="label.question">Question</div>
+            <div id="question">…</div>
+          </div>
+          <div id="meta-line"></div>
+        </div>
+        <div id="answers" class="answers"></div>
+        <div class="footer-row">
+          <div id="status"></div>
+          <button id="btn-next" data-i18n="btn.next_question" hidden>Next Question</button>
+        </div>
+      </div>
+
+      <p class="hint" data-i18n="hint.trivia">Choose a difficulty, answer ten multiple-choice questions, and use the language switch for the interface.</p>
+      <p class="credit">
+        <span data-i18n="trivia.credit_prefix">Questions courtesy of</span>
+        <a href="https://opentdb.com/" target="_blank" rel="noreferrer">Open Trivia DB</a>.
+        <span data-i18n="trivia.credit_suffix">The API currently provides question text in English.</span>
+      </p>
+    </div>
+  </div>
+
+  <div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelp()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeHelp()">×</button>
+      <div class="modal-title"><span data-i18n="help.how_to_play">How to Play</span> — <span data-i18n="game.trivia">Trivia</span></div>
+      <ol class="modal-steps">
+        <li data-i18n-html="help.trivia.1">Pick a <strong>difficulty</strong> and optional category, then load a fresh set of questions.</li>
+        <li data-i18n-html="help.trivia.2">Tap one of the <strong>4 answers</strong>. You get immediate feedback and move to the next question.</li>
+        <li data-i18n-html="help.trivia.3">The interface supports <strong>English and Hebrew</strong>, and the page credits <strong>Open Trivia DB</strong> as the question source.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    function openHelp(){document.getElementById('help-modal').style.display='flex';}
+    function closeHelp(){document.getElementById('help-modal').style.display='none';}
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp();});
+  </script>
+  <script src="../../rating.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

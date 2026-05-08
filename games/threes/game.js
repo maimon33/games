@@ -6,7 +6,8 @@ const nextBoxEl = document.getElementById('next-box');
 const statusEl = document.getElementById('status');
 const btnNew = document.getElementById('btn-new');
 
-const PAD = 8, GAP = 8, CELL = 65, N = 4;
+const PAD = 8, N = 4;
+let GAP = 8, CELL = 65;
 let grid, nextTile, best, gameOver;
 
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
@@ -24,15 +25,24 @@ function tileStyle(val) {
 }
 
 function fontSize(val) {
-  if (val <= 99)  return 28;
-  if (val <= 999) return 20;
-  return 14;
+  if (val <= 99)  return Math.round(CELL * 0.44);
+  if (val <= 999) return Math.round(CELL * 0.31);
+  return Math.round(CELL * 0.22);
 }
 
 function cellX(c) { return PAD + c * (CELL + GAP); }
 function cellY(r) { return PAD + r * (CELL + GAP); }
 
+function resize() {
+  const size = Math.min(window.innerWidth - 32, 420);
+  canvas.width = canvas.height = size;
+  GAP = Math.max(8, Math.round(size * 0.026));
+  CELL = Math.floor((size - PAD * 2 - GAP * (N - 1)) / N);
+  draw();
+}
+
 function draw() {
+  if (!grid) return;
   const W = canvas.width;
   ctx.clearRect(0, 0, W, W);
 
@@ -256,4 +266,6 @@ function onThemeChange() { draw(); }
 
 best = parseInt(localStorage.getItem('threes-best') || '0', 10);
 bestEl.textContent = best;
+window.addEventListener('resize', resize);
+resize();
 newGame();

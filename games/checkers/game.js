@@ -119,7 +119,7 @@ function toView(r, c)     { return myColor === 'b' ? [7-r,  7-c]  : [r, c]; }
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const sz = Math.min(window.innerWidth - 32, 480);
+  const sz = Math.min(window.innerWidth - 32, 640);
   canvas.width = canvas.height = sz;
   CELL = sz / 8;
   draw();

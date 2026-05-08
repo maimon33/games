@@ -36,7 +36,7 @@ let CELL, GRID_SIZE, dots = [], paths = [], dragging = null, levelIdx = 0;
 function cv(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
 function resize() {
-  const size = Math.min(window.innerWidth - 32, 420);
+  const size = Math.min(window.innerWidth - 32, 520);
   canvas.width = canvas.height = size;
   CELL = GRID_SIZE ? size / GRID_SIZE : size / 5;
   draw();

@@ -180,7 +180,7 @@ function toActual(vr, vc) { return myColor === 'b' ? [7-vr, 7-vc] : [vr, vc]; }
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const sz = Math.min(window.innerWidth - 32, 480);
+  const sz = Math.min(window.innerWidth - 32, 640);
   canvas.width = canvas.height = sz;
   CELL = sz / 8;
   draw();

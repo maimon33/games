@@ -78,7 +78,7 @@ function placeWord(word) {
 // ── Rendering ─────────────────────────────────────────────────────────────────
 
 function resize() {
-  const sz = Math.min(window.innerWidth - 32, 420);
+  const sz = Math.min(window.innerWidth - 32, 520);
   canvas.width = canvas.height = sz;
   CELL = sz / GRID_SIZE;
   draw();

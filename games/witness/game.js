@@ -78,6 +78,12 @@ const PAD = 40;
 let levelIdx = 0;
 let lvl, path, drawing, won;
 
+function resize() {
+  const size = Math.min(window.innerWidth - 32, 560);
+  canvas.width = canvas.height = size;
+  draw();
+}
+
 // ----- geometry -----
 
 function spacing() { return (canvas.width - 2 * PAD) / (lvl.N - 1); }
@@ -232,6 +238,7 @@ function resetLevel() {
 // ----- draw -----
 
 function draw() {
+  if (!lvl) return;
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
@@ -457,4 +464,6 @@ document.getElementById('btn-reset').addEventListener('click', resetLevel);
 function onThemeChange() { draw(); }
 function onLangChange() {}
 
+window.addEventListener('resize', resize);
 initLevel(0);
+resize();
