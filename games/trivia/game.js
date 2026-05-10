@@ -62,6 +62,9 @@ function difficultyLabel(value) {
 }
 
 function activeLang() {
+  if (languageSelect && (languageSelect.value === 'he' || languageSelect.value === 'en')) {
+    return languageSelect.value;
+  }
   return document.documentElement.lang === 'he' ? 'he' : 'en';
 }
 
@@ -393,7 +396,6 @@ function refillStepForDuration(ms) {
 
 async function ensureQueue(targetFill, sourceRoundId) {
   if (isRefilling) return;
-  if (!currentQuestion && !isLoadingRound && !queue.length) return;
 
   isRefilling = true;
   updateSourcePill();
@@ -493,7 +495,7 @@ function goNext() {
   if (!answered) return;
   currentQuestion = null;
   promoteNextQuestion();
-  if (currentQuestion) ensureQueue(currentBufferTarget(), roundId);
+  ensureQueue(currentBufferTarget(), roundId);
 }
 
 async function startNewSet() {
