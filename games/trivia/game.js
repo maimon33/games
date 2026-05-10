@@ -10,15 +10,27 @@ const statusEl = document.getElementById('status');
 const scoreEl = document.getElementById('score');
 const questionNumberEl = document.getElementById('question-number');
 const difficultyPillEl = document.getElementById('difficulty-pill');
+const sourcePillEl = document.getElementById('source-pill');
 
 const QUESTION_COUNT = 10;
+const INITIAL_BUFFER = 5;
+const MAX_BUFFER = 10;
+const FAST_ANSWER_MS = 1000;
+const SLOW_ANSWER_MS = 5000;
+
 let token = '';
 let categories = [];
-let questions = [];
-let currentIndex = 0;
+let queue = [];
+let currentQuestion = null;
+let askedCount = 0;
 let score = 0;
 let answered = false;
 let emptyState = 'loading';
+let isLoadingRound = false;
+let isRefilling = false;
+let roundId = 0;
+let answerStartedAt = 0;
+let currentRefillStep = 1;
 
 function decodeText(value) {
   try {
@@ -49,13 +61,20 @@ function setStatus(message, kind) {
   statusEl.className = kind || '';
 }
 
-function setLoadingState(isLoading) {
-  btnNewSet.disabled = isLoading;
-  difficultySelect.disabled = isLoading;
-  categorySelect.disabled = isLoading;
-  btnNext.disabled = isLoading;
+function updateSourcePill() {
+  sourcePillEl.textContent = t('trivia.buffer_short', { n: queue.length });
+}
+
+function setSetupLocked(isLocked) {
+  btnNewSet.disabled = isLocked;
+  difficultySelect.disabled = isLocked;
+  categorySelect.disabled = isLocked;
+}
+
+function setAnswerButtonsLocked(isLocked) {
+  btnNext.disabled = isLocked;
   answersEl.querySelectorAll('button').forEach(button => {
-    button.disabled = isLoading || answered;
+    button.disabled = isLocked || answered;
   });
 }
 
@@ -121,9 +140,9 @@ function mapQuestions(results) {
   });
 }
 
-async function fetchQuestions(retryCount) {
+async function fetchBatch(amount, retryCount) {
   const params = new URLSearchParams({
-    amount: String(QUESTION_COUNT),
+    amount: String(amount),
     type: 'multiple',
     encode: 'url3986'
   });
@@ -141,12 +160,12 @@ async function fetchQuestions(retryCount) {
   if (data.response_code === 3 && retryCount < 1) {
     token = '';
     await ensureToken();
-    return fetchQuestions(retryCount + 1);
+    return fetchBatch(amount, retryCount + 1);
   }
 
   if (data.response_code === 4 && retryCount < 1) {
     await resetToken();
-    return fetchQuestions(retryCount + 1);
+    return fetchBatch(amount, retryCount + 1);
   }
 
   if (data.response_code !== 0 || !Array.isArray(data.results) || !data.results.length) {
@@ -156,34 +175,52 @@ async function fetchQuestions(retryCount) {
   return mapQuestions(data.results);
 }
 
+function remainingSlots() {
+  const current = currentQuestion ? 1 : 0;
+  return Math.max(0, QUESTION_COUNT - askedCount - queue.length - current);
+}
+
+function currentBufferTarget() {
+  return Math.min(MAX_BUFFER, INITIAL_BUFFER + Math.max(0, currentRefillStep - 1));
+}
+
+function updateMetaLine() {
+  if (!currentQuestion) {
+    metaLineEl.textContent = '';
+    return;
+  }
+
+  metaLineEl.textContent = t('trivia.meta', {
+    current: askedCount,
+    total: QUESTION_COUNT,
+    category: currentQuestion.category,
+    difficulty: difficultyLabel(currentQuestion.difficulty)
+  });
+}
+
 function renderQuestion() {
-  const item = questions[currentIndex];
   answered = false;
   btnNext.hidden = true;
   btnNext.disabled = false;
 
-  if (!item) {
+  if (!currentQuestion) {
     questionEl.textContent = t('trivia.done_title');
-    metaLineEl.textContent = t('trivia.complete', { score, total: questions.length });
+    metaLineEl.textContent = t('trivia.complete', { score, total: QUESTION_COUNT });
     answersEl.innerHTML = '';
-    questionNumberEl.textContent = `${questions.length}/${questions.length}`;
+    questionNumberEl.textContent = `${QUESTION_COUNT}/${QUESTION_COUNT}`;
     difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
-    setStatus(t('trivia.done_status', { score, total: questions.length }), 'good');
+    updateSourcePill();
+    setStatus(t('trivia.done_status', { score, total: QUESTION_COUNT }), 'good');
     return;
   }
 
-  questionEl.textContent = item.question;
-  metaLineEl.textContent = t('trivia.meta', {
-    current: currentIndex + 1,
-    total: questions.length,
-    category: item.category,
-    difficulty: difficultyLabel(item.difficulty)
-  });
-  questionNumberEl.textContent = `${currentIndex + 1}/${questions.length}`;
+  questionEl.textContent = currentQuestion.question;
+  updateMetaLine();
+  questionNumberEl.textContent = `${askedCount}/${QUESTION_COUNT}`;
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
   answersEl.innerHTML = '';
 
-  item.answers.forEach(answer => {
+  currentQuestion.answers.forEach(answer => {
     const button = document.createElement('button');
     button.className = 'answer-btn';
     button.type = 'button';
@@ -192,15 +229,93 @@ function renderQuestion() {
     answersEl.appendChild(button);
   });
 
-  setStatus(t('trivia.english_note'));
+  answerStartedAt = Date.now();
+  updateSourcePill();
+  if (isRefilling) {
+    setStatus(t('trivia.prefetching', { n: queue.length }));
+  } else {
+    setStatus(t('trivia.english_note'));
+  }
+}
+
+function refillStepForDuration(ms) {
+  if (ms < FAST_ANSWER_MS) return 4;
+  if (ms > SLOW_ANSWER_MS) return 1;
+  return 2;
+}
+
+async function ensureQueue(targetFill, sourceRoundId) {
+  if (isRefilling) return;
+  if (!currentQuestion && !isLoadingRound && !queue.length && askedCount >= QUESTION_COUNT) return;
+
+  isRefilling = true;
+  updateSourcePill();
+  if (currentQuestion && !answered) {
+    setStatus(t('trivia.prefetching', { n: queue.length }));
+  }
+
+  try {
+    while (roundId === sourceRoundId) {
+      const missingToTarget = targetFill - queue.length;
+      const remaining = remainingSlots();
+      const need = Math.min(missingToTarget, remaining);
+      if (need <= 0) break;
+      const batch = await fetchBatch(need, 0);
+      if (roundId !== sourceRoundId) return;
+      queue.push(...batch.slice(0, need));
+      updateSourcePill();
+      if (!currentQuestion && !isLoadingRound && askedCount < QUESTION_COUNT && queue.length) {
+        promoteNextQuestion();
+      }
+    }
+  } catch (err) {
+    if (roundId !== sourceRoundId) return;
+    if (!currentQuestion && !queue.length) {
+      emptyState = 'error';
+      questionEl.textContent = t('trivia.error_title');
+      metaLineEl.textContent = '';
+      answersEl.innerHTML = '';
+      setStatus(t('trivia.error_body'), 'bad');
+    }
+  } finally {
+    if (roundId === sourceRoundId) {
+      isRefilling = false;
+      updateSourcePill();
+      if (currentQuestion && !answered) setStatus(t('trivia.english_note'));
+    }
+  }
+}
+
+function promoteNextQuestion() {
+  if (askedCount >= QUESTION_COUNT) {
+    currentQuestion = null;
+    renderQuestion();
+    return;
+  }
+
+  currentQuestion = queue.shift() || null;
+  if (!currentQuestion) {
+    questionEl.textContent = t('trivia.loading_next');
+    metaLineEl.textContent = '';
+    answersEl.innerHTML = '';
+    questionNumberEl.textContent = `${Math.min(askedCount + 1, QUESTION_COUNT)}/${QUESTION_COUNT}`;
+    updateSourcePill();
+    setStatus(t('trivia.loading_next'));
+    return;
+  }
+
+  askedCount += 1;
+  renderQuestion();
 }
 
 function submitAnswer(answer, buttonEl) {
-  if (answered) return;
+  if (answered || !currentQuestion) return;
   answered = true;
 
-  const item = questions[currentIndex];
-  const isCorrect = answer === item.correctAnswer;
+  const responseMs = Date.now() - answerStartedAt;
+  currentRefillStep = refillStepForDuration(responseMs);
+  const isCorrect = answer === currentQuestion.correctAnswer;
+
   if (isCorrect) {
     score += 1;
     scoreEl.textContent = String(score);
@@ -209,55 +324,74 @@ function submitAnswer(answer, buttonEl) {
   } else {
     buttonEl.classList.add('wrong');
     answersEl.querySelectorAll('button').forEach(button => {
-      if (button.textContent === item.correctAnswer) button.classList.add('correct');
+      if (button.textContent === currentQuestion.correctAnswer) button.classList.add('correct');
     });
-    setStatus(t('trivia.wrong', { answer: item.correctAnswer }), 'bad');
+    setStatus(t('trivia.wrong', { answer: currentQuestion.correctAnswer }), 'bad');
   }
 
   answersEl.querySelectorAll('button').forEach(button => {
     button.disabled = true;
   });
+
+  updateSourcePill();
   btnNext.hidden = false;
+
+  if (askedCount < QUESTION_COUNT) {
+    ensureQueue(currentBufferTarget(), roundId);
+  }
 }
 
 function goNext() {
-  if (!answered && currentIndex < questions.length) return;
-  currentIndex += 1;
-  if (currentIndex >= questions.length) {
-    renderQuestion();
-    btnNext.hidden = true;
-    return;
+  if (!answered && askedCount <= QUESTION_COUNT) return;
+  currentQuestion = null;
+  promoteNextQuestion();
+  if (currentQuestion && askedCount < QUESTION_COUNT) {
+    ensureQueue(currentBufferTarget(), roundId);
   }
-  renderQuestion();
 }
 
 async function startNewSet() {
-  setLoadingState(true);
+  const thisRound = ++roundId;
+  isLoadingRound = true;
+  isRefilling = false;
   score = 0;
-  currentIndex = 0;
+  askedCount = 0;
   answered = false;
   emptyState = 'loading';
+  currentRefillStep = 1;
+  currentQuestion = null;
+  queue = [];
   scoreEl.textContent = '0';
   questionNumberEl.textContent = `0/${QUESTION_COUNT}`;
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
+  updateSourcePill();
   questionEl.textContent = t('trivia.loading');
   metaLineEl.textContent = '';
   answersEl.innerHTML = '';
   setStatus(t('trivia.loading'));
+  setSetupLocked(true);
+  setAnswerButtonsLocked(true);
 
   try {
-    questions = await fetchQuestions(0);
+    await ensureQueue(INITIAL_BUFFER, thisRound);
+    if (roundId !== thisRound) return;
     emptyState = '';
-    renderQuestion();
+    promoteNextQuestion();
+    ensureQueue(currentBufferTarget(), thisRound);
   } catch (err) {
-    questions = [];
+    if (roundId !== thisRound) return;
     emptyState = 'error';
     questionEl.textContent = t('trivia.error_title');
     metaLineEl.textContent = '';
     answersEl.innerHTML = '';
     setStatus(t('trivia.error_body'), 'bad');
   } finally {
-    setLoadingState(false);
+    if (roundId === thisRound) {
+      isLoadingRound = false;
+      setSetupLocked(false);
+      setAnswerButtonsLocked(false);
+      updateSourcePill();
+    }
   }
 }
 
@@ -265,35 +399,37 @@ function onLangChange() {
   languageSelect.value = document.documentElement.lang === 'he' ? 'he' : 'en';
   renderCategories();
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
+  updateSourcePill();
 
-  if (!questions.length) {
-    if (emptyState === 'error') {
-      questionEl.textContent = t('trivia.error_title');
-      setStatus(t('trivia.error_body'), 'bad');
-    } else {
-      questionEl.textContent = t('trivia.loading');
-      setStatus(t('trivia.loading'));
-    }
+  if (emptyState === 'error') {
+    questionEl.textContent = t('trivia.error_title');
+    setStatus(t('trivia.error_body'), 'bad');
     return;
   }
 
-  const item = questions[currentIndex];
-  if (!item) {
+  if (isLoadingRound && !currentQuestion) {
+    questionEl.textContent = t('trivia.loading');
+    setStatus(t('trivia.loading'));
+    return;
+  }
+
+  if (!currentQuestion && askedCount >= QUESTION_COUNT) {
     questionEl.textContent = t('trivia.done_title');
-    metaLineEl.textContent = t('trivia.complete', { score, total: questions.length });
-    setStatus(t('trivia.done_status', { score, total: questions.length }), 'good');
+    metaLineEl.textContent = t('trivia.complete', { score, total: QUESTION_COUNT });
+    setStatus(t('trivia.done_status', { score, total: QUESTION_COUNT }), 'good');
     return;
   }
 
-  metaLineEl.textContent = t('trivia.meta', {
-    current: currentIndex + 1,
-    total: questions.length,
-    category: item.category,
-    difficulty: difficultyLabel(item.difficulty)
-  });
+  if (!currentQuestion) {
+    questionEl.textContent = t('trivia.loading_next');
+    setStatus(t('trivia.loading_next'));
+    return;
+  }
 
+  updateMetaLine();
   if (!answered) {
-    setStatus(t('trivia.english_note'));
+    if (isRefilling) setStatus(t('trivia.prefetching', { n: queue.length }));
+    else setStatus(t('trivia.english_note'));
   }
 }
 
