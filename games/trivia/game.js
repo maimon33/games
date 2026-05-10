@@ -11,8 +11,8 @@ const scoreEl = document.getElementById('score');
 const questionNumberEl = document.getElementById('question-number');
 const difficultyPillEl = document.getElementById('difficulty-pill');
 const sourcePillEl = document.getElementById('source-pill');
+const translatePillEl = document.getElementById('translate-pill');
 
-const QUESTION_COUNT = 10;
 const INITIAL_BUFFER = 5;
 const MAX_BUFFER = 10;
 const FAST_ANSWER_MS = 1000;
@@ -72,6 +72,26 @@ function setStatus(message, kind) {
 
 function updateSourcePill() {
   sourcePillEl.textContent = t('trivia.buffer_short', { n: queue.length });
+}
+
+function updateTranslationPill() {
+  if (activeLang() !== 'he') {
+    translatePillEl.textContent = 'EN';
+    return;
+  }
+  if (!currentQuestion) {
+    translatePillEl.textContent = t('trivia.pending_short');
+    return;
+  }
+  if (currentQuestion.translations.he) {
+    translatePillEl.textContent = t('trivia.translated_short');
+    return;
+  }
+  if (currentQuestion.translationState === 'failed') {
+    translatePillEl.textContent = t('trivia.fallback_short');
+    return;
+  }
+  translatePillEl.textContent = t('trivia.pending_short');
 }
 
 function setSetupLocked(isLocked) {
@@ -145,7 +165,8 @@ function mapQuestions(results) {
       question: decodeText(item.question),
       correctAnswer,
       answers,
-      translations: { en: null, he: null }
+      translations: { en: null, he: null },
+      translationState: 'idle'
     };
   });
 }
@@ -198,9 +219,11 @@ async function ensureQuestionTranslation(item, lang) {
   const signature = questionSignature(item);
   if (translationCache.has(signature)) {
     item.translations.he = translationCache.get(signature);
+    item.translationState = 'ready';
     return;
   }
 
+  item.translationState = 'pending';
   const translated = await translateTexts(
     [item.question, item.category].concat(item.answers),
     'he'
@@ -213,6 +236,7 @@ async function ensureQuestionTranslation(item, lang) {
   };
   translationCache.set(signature, payload);
   item.translations.he = payload;
+  item.translationState = 'ready';
 }
 
 async function localizeQuestions(items, lang) {
@@ -228,6 +252,9 @@ async function localizeQuestions(items, lang) {
   }
 
   await Promise.allSettled(items.map(item => ensureQuestionTranslation(item, lang)));
+  items.forEach(item => {
+    if (!item.translations.he && item.translationState !== 'ready') item.translationState = 'failed';
+  });
   return items;
 }
 
@@ -277,8 +304,7 @@ async function fetchBatch(amount, retryCount) {
 }
 
 function remainingSlots() {
-  const current = currentQuestion ? 1 : 0;
-  return Math.max(0, QUESTION_COUNT - askedCount - queue.length - current);
+  return Math.max(0, currentBufferTarget() - queue.length);
 }
 
 function currentBufferTarget() {
@@ -294,7 +320,6 @@ function updateMetaLine() {
   const shown = displayText(currentQuestion);
   metaLineEl.textContent = t('trivia.meta', {
     current: askedCount,
-    total: QUESTION_COUNT,
     category: shown.category,
     difficulty: difficultyLabel(currentQuestion.difficulty)
   });
@@ -313,20 +338,21 @@ function renderQuestion() {
   btnNext.disabled = false;
 
   if (!currentQuestion) {
-    questionEl.textContent = t('trivia.done_title');
-    metaLineEl.textContent = t('trivia.complete', { score, total: QUESTION_COUNT });
+    questionEl.textContent = t('trivia.loading_next');
+    metaLineEl.textContent = '';
     answersEl.innerHTML = '';
-    questionNumberEl.textContent = `${QUESTION_COUNT}/${QUESTION_COUNT}`;
+    questionNumberEl.textContent = String(askedCount);
     difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
     updateSourcePill();
-    setStatus(t('trivia.done_status', { score, total: QUESTION_COUNT }), 'good');
+    updateTranslationPill();
+    setStatus(t('trivia.loading_next'));
     return;
   }
 
   const shown = displayText(currentQuestion);
   questionEl.textContent = shown.question;
   updateMetaLine();
-  questionNumberEl.textContent = `${askedCount}/${QUESTION_COUNT}`;
+  questionNumberEl.textContent = String(askedCount);
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
   answersEl.innerHTML = '';
 
@@ -342,9 +368,16 @@ function renderQuestion() {
 
   answerStartedAt = Date.now();
   updateSourcePill();
+  updateTranslationPill();
   if (activeLang() === 'he') {
-    if (isRefilling) setStatus(t('trivia.prefetching_hebrew', { n: queue.length }));
-    else setStatus(t('trivia.machine_hebrew'));
+    if (currentQuestion.translations.he) {
+      if (isRefilling) setStatus(t('trivia.prefetching_hebrew', { n: queue.length }));
+      else setStatus(t('trivia.machine_hebrew'));
+    } else if (currentQuestion.translationState === 'failed') {
+      setStatus(t('trivia.translate_failed'));
+    } else {
+      setStatus(t('trivia.translating_now'));
+    }
   } else if (isRefilling) {
     setStatus(t('trivia.prefetching', { n: queue.length }));
   } else {
@@ -360,7 +393,7 @@ function refillStepForDuration(ms) {
 
 async function ensureQueue(targetFill, sourceRoundId) {
   if (isRefilling) return;
-  if (!currentQuestion && !isLoadingRound && !queue.length && askedCount >= QUESTION_COUNT) return;
+  if (!currentQuestion && !isLoadingRound && !queue.length) return;
 
   isRefilling = true;
   updateSourcePill();
@@ -370,9 +403,7 @@ async function ensureQueue(targetFill, sourceRoundId) {
 
   try {
     while (roundId === sourceRoundId) {
-      const missingToTarget = targetFill - queue.length;
-      const remaining = remainingSlots();
-      const need = Math.min(missingToTarget, remaining);
+      const need = Math.min(targetFill - queue.length, remainingSlots());
       if (need <= 0) break;
       const batch = await fetchBatch(need, 0);
       if (roundId !== sourceRoundId) return;
@@ -380,7 +411,7 @@ async function ensureQueue(targetFill, sourceRoundId) {
       if (roundId !== sourceRoundId) return;
       queue.push(...batch.slice(0, need));
       updateSourcePill();
-      if (!currentQuestion && !isLoadingRound && askedCount < QUESTION_COUNT && queue.length) {
+      if (!currentQuestion && !isLoadingRound && queue.length) {
         promoteNextQuestion();
       }
     }
@@ -397,8 +428,11 @@ async function ensureQueue(targetFill, sourceRoundId) {
     if (roundId === sourceRoundId) {
       isRefilling = false;
       updateSourcePill();
+      updateTranslationPill();
       if (currentQuestion && !answered) {
-        if (activeLang() === 'he') setStatus(t('trivia.machine_hebrew'));
+        if (activeLang() === 'he' && currentQuestion.translations.he) setStatus(t('trivia.machine_hebrew'));
+        else if (activeLang() === 'he' && currentQuestion.translationState === 'failed') setStatus(t('trivia.translate_failed'));
+        else if (activeLang() === 'he') setStatus(t('trivia.translating_now'));
         else setStatus(t('trivia.english_note'));
       }
     }
@@ -406,19 +440,14 @@ async function ensureQueue(targetFill, sourceRoundId) {
 }
 
 function promoteNextQuestion() {
-  if (askedCount >= QUESTION_COUNT) {
-    currentQuestion = null;
-    renderQuestion();
-    return;
-  }
-
   currentQuestion = queue.shift() || null;
   if (!currentQuestion) {
     questionEl.textContent = t('trivia.loading_next');
     metaLineEl.textContent = '';
     answersEl.innerHTML = '';
-    questionNumberEl.textContent = `${Math.min(askedCount + 1, QUESTION_COUNT)}/${QUESTION_COUNT}`;
+    questionNumberEl.textContent = String(askedCount + 1);
     updateSourcePill();
+    updateTranslationPill();
     setStatus(t('trivia.loading_next'));
     return;
   }
@@ -457,18 +486,14 @@ function submitAnswer(answerIndex, buttonEl) {
   updateSourcePill();
   btnNext.hidden = false;
 
-  if (askedCount < QUESTION_COUNT) {
-    ensureQueue(currentBufferTarget(), roundId);
-  }
+  ensureQueue(currentBufferTarget(), roundId);
 }
 
 function goNext() {
-  if (!answered && askedCount <= QUESTION_COUNT) return;
+  if (!answered) return;
   currentQuestion = null;
   promoteNextQuestion();
-  if (currentQuestion && askedCount < QUESTION_COUNT) {
-    ensureQueue(currentBufferTarget(), roundId);
-  }
+  if (currentQuestion) ensureQueue(currentBufferTarget(), roundId);
 }
 
 async function startNewSet() {
@@ -483,9 +508,10 @@ async function startNewSet() {
   currentQuestion = null;
   queue = [];
   scoreEl.textContent = '0';
-  questionNumberEl.textContent = `0/${QUESTION_COUNT}`;
+  questionNumberEl.textContent = '0';
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
   updateSourcePill();
+  updateTranslationPill();
   questionEl.textContent = t('trivia.loading');
   metaLineEl.textContent = '';
   answersEl.innerHTML = '';
@@ -512,6 +538,7 @@ async function startNewSet() {
       setSetupLocked(false);
       setAnswerButtonsLocked(false);
       updateSourcePill();
+      updateTranslationPill();
     }
   }
 }
@@ -521,6 +548,7 @@ function onLangChange() {
   renderCategories();
   difficultyPillEl.textContent = difficultyLabel(difficultySelect.value);
   updateSourcePill();
+  updateTranslationPill();
 
   if (activeLang() === 'he') {
     if (currentQuestion) ensureQuestionTranslation(currentQuestion, 'he').then(() => {
@@ -543,13 +571,6 @@ function onLangChange() {
     return;
   }
 
-  if (!currentQuestion && askedCount >= QUESTION_COUNT) {
-    questionEl.textContent = t('trivia.done_title');
-    metaLineEl.textContent = t('trivia.complete', { score, total: QUESTION_COUNT });
-    setStatus(t('trivia.done_status', { score, total: QUESTION_COUNT }), 'good');
-    return;
-  }
-
   if (!currentQuestion) {
     questionEl.textContent = t('trivia.loading_next');
     setStatus(t('trivia.loading_next'));
@@ -561,8 +582,14 @@ function onLangChange() {
   updateMetaLine();
   if (!answered) {
     if (activeLang() === 'he') {
-      if (isRefilling) setStatus(t('trivia.prefetching_hebrew', { n: queue.length }));
-      else setStatus(t('trivia.machine_hebrew'));
+      if (currentQuestion.translations.he) {
+        if (isRefilling) setStatus(t('trivia.prefetching_hebrew', { n: queue.length }));
+        else setStatus(t('trivia.machine_hebrew'));
+      } else if (currentQuestion.translationState === 'failed') {
+        setStatus(t('trivia.translate_failed'));
+      } else {
+        setStatus(t('trivia.translating_now'));
+      }
     } else if (isRefilling) {
       setStatus(t('trivia.prefetching', { n: queue.length }));
     } else {
